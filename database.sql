@@ -1,6 +1,6 @@
 /*==============================================================*/
 /* DBMS name:      ORACLE Version 19c                           */
-/* Created on:     22.10.2024 16:52:38                          */
+/* Created on:     29.10.2024 15:03:56                          */
 /*==============================================================*/
 
 
@@ -16,6 +16,12 @@ alter table FLIGHT
 alter table FLIGHT
    drop constraint FK_FLIGHT_USER;
 
+alter table FLIGHT
+   drop constraint FK_FLIGHT_REFERENCE_TERMINAL;
+
+alter table PLANE
+   drop constraint FK_PLANE_AIRLINE;
+
 alter table TICKET
    drop constraint FK_TICKET_FLIGHT;
 
@@ -28,6 +34,8 @@ alter table USERROLE
 alter table USERROLE
    drop constraint FK_USERROLE_USER;
 
+drop table AIRLINE cascade constraints;
+
 drop table AIRPORT cascade constraints;
 
 drop table FLIGHT cascade constraints;
@@ -36,6 +44,8 @@ drop table PLANE cascade constraints;
 
 drop table ROLE cascade constraints;
 
+drop table TERMINAL cascade constraints;
+
 drop table TICKET cascade constraints;
 
 drop table "USER" cascade constraints;
@@ -43,10 +53,19 @@ drop table "USER" cascade constraints;
 drop table USERROLE cascade constraints;
 
 /*==============================================================*/
+/* Table: AIRLINE                                               */
+/*==============================================================*/
+create table AIRLINE (
+   ID                   VARCHAR(255)          not null,
+   NAME                 VARCHAR(255)          not null,
+   constraint PK_AIRLINE primary key (ID)
+);
+
+/*==============================================================*/
 /* Table: AIRPORT                                               */
 /*==============================================================*/
 create table AIRPORT (
-   ID                   LONG                  not null,
+   ID                   VARCHAR(255)          not null,
    NAME                 VARCHAR(255),
    COUNTRY              VARCHAR(255)          not null,
    CITY                 VARCHAR(255)          not null,
@@ -57,12 +76,13 @@ create table AIRPORT (
 /* Table: FLIGHT                                                */
 /*==============================================================*/
 create table FLIGHT (
-   ID                   LONG                  not null,
-   "FROM"               LONG                  not null,
-   "TO"                 LONG                  not null,
+   ID                   VARCHAR(255)          not null,
+   "FROM"               VARCHAR(255)          not null,
+   "TO"                 VARCHAR(255)          not null,
    "DATE"               DATE                  not null,
-   PILOT                LONG                  not null,
-   PLANE                LONG                  not null,
+   PILOT                VARCHAR(255)          not null,
+   PLANE                VARCHAR(255)          not null,
+   TERMINAL             VARCHAR,
    constraint PK_FLIGHT primary key (ID)
 );
 
@@ -70,10 +90,11 @@ create table FLIGHT (
 /* Table: PLANE                                                 */
 /*==============================================================*/
 create table PLANE (
-   ID                   LONG                  not null,
+   ID                   VARCHAR(255)          not null,
    NAME                 VARCHAR(255),
    MODEL                VARCHAR(255)          not null,
    SEATS                NUMBER(10)            not null,
+   AIRLINE              VARCHAR(255),
    constraint PK_PLANE primary key (ID)
 );
 
@@ -81,19 +102,28 @@ create table PLANE (
 /* Table: ROLE                                                  */
 /*==============================================================*/
 create table ROLE (
-   ID                   LONG                  not null,
+   ID                   VARCHAR(255)          not null,
    NAME                 VARCHAR(255)          not null,
    LABEL                VARCHAR(255)          not null,
    constraint PK_ROLE primary key (ID)
 );
 
 /*==============================================================*/
+/* Table: TERMINAL                                              */
+/*==============================================================*/
+create table TERMINAL (
+   ID                   VARCHAR               not null,
+   NAME                 VARCHAR               not null,
+   constraint PK_TERMINAL primary key (ID)
+);
+
+/*==============================================================*/
 /* Table: TICKET                                                */
 /*==============================================================*/
 create table TICKET (
-   ID                   LONG                  not null,
-   "USER"               LONG                  not null,
-   FLIGHT               LONG                  not null,
+   ID                   VARCHAR(255)          not null,
+   "USER"               VARCHAR(255)          not null,
+   FLIGHT               VARCHAR(255)          not null,
    constraint PK_TICKET primary key (ID)
 );
 
@@ -101,7 +131,7 @@ create table TICKET (
 /* Table: "USER"                                                */
 /*==============================================================*/
 create table "USER" (
-   ID                   LONG                  not null,
+   ID                   VARCHAR(255)          not null,
    FIRSTNAME            VARCHAR(255)          not null,
    LASTNAME             VARCHAR(255)          not null,
    BIRTHDATE            DATE                  not null,
@@ -114,9 +144,9 @@ create table "USER" (
 /* Table: USERROLE                                              */
 /*==============================================================*/
 create table USERROLE (
-   ID                   LONG                  not null,
-   "USER"               LONG                  not null,
-   ROLE                 LONG                  not null,
+   ID                   VARCHAR(255)          not null,
+   "USER"               VARCHAR(255)          not null,
+   ROLE                 VARCHAR(255)          not null,
    constraint PK_USERROLE primary key (ID)
 );
 
@@ -135,6 +165,14 @@ alter table FLIGHT
 alter table FLIGHT
    add constraint FK_FLIGHT_USER foreign key (PILOT)
       references "USER" (ID);
+
+alter table FLIGHT
+   add constraint FK_FLIGHT_REFERENCE_TERMINAL foreign key (TERMINAL)
+      references TERMINAL (ID);
+
+alter table PLANE
+   add constraint FK_PLANE_AIRLINE foreign key (AIRLINE)
+      references AIRLINE (ID);
 
 alter table TICKET
    add constraint FK_TICKET_FLIGHT foreign key (FLIGHT)
