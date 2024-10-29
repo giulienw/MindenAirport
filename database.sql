@@ -56,7 +56,7 @@ drop table USERROLE cascade constraints;
 /* Table: AIRLINE                                               */
 /*==============================================================*/
 create table AIRLINE (
-   ID                   VARCHAR(255)          not null,
+   ID                   VARCHAR2(36)          not null,
    NAME                 VARCHAR(255)          not null,
    constraint PK_AIRLINE primary key (ID)
 );
@@ -65,7 +65,7 @@ create table AIRLINE (
 /* Table: AIRPORT                                               */
 /*==============================================================*/
 create table AIRPORT (
-   ID                   VARCHAR(255)          not null,
+   ID                   VARCHAR2(36)          not null,
    NAME                 VARCHAR(255),
    COUNTRY              VARCHAR(255)          not null,
    CITY                 VARCHAR(255)          not null,
@@ -76,12 +76,12 @@ create table AIRPORT (
 /* Table: FLIGHT                                                */
 /*==============================================================*/
 create table FLIGHT (
-   ID                   VARCHAR(255)          not null,
-   "FROM"               VARCHAR(255)          not null,
-   "TO"                 VARCHAR(255)          not null,
+   ID                   VARCHAR2(36)          not null,
+   "FROM"               VARCHAR2(36)          not null,
+   "TO"                 VARCHAR2(36)          not null,
    "DATE"               DATE                  not null,
-   PILOT                VARCHAR(255)          not null,
-   PLANE                VARCHAR(255)          not null,
+   PILOT                VARCHAR2(36)          not null,
+   PLANE                VARCHAR2(36)          not null,
    TERMINAL             VARCHAR,
    constraint PK_FLIGHT primary key (ID)
 );
@@ -90,11 +90,11 @@ create table FLIGHT (
 /* Table: PLANE                                                 */
 /*==============================================================*/
 create table PLANE (
-   ID                   VARCHAR(255)          not null,
+   ID                   VARCHAR2(36)          not null,
    NAME                 VARCHAR(255),
    MODEL                VARCHAR(255)          not null,
    SEATS                NUMBER(10)            not null,
-   AIRLINE              VARCHAR(255),
+   AIRLINE              VARCHAR2(36),
    constraint PK_PLANE primary key (ID)
 );
 
@@ -102,7 +102,7 @@ create table PLANE (
 /* Table: ROLE                                                  */
 /*==============================================================*/
 create table ROLE (
-   ID                   VARCHAR(255)          not null,
+   ID                   VARCHAR2(36)          not null,
    NAME                 VARCHAR(255)          not null,
    LABEL                VARCHAR(255)          not null,
    constraint PK_ROLE primary key (ID)
@@ -121,9 +121,9 @@ create table TERMINAL (
 /* Table: TICKET                                                */
 /*==============================================================*/
 create table TICKET (
-   ID                   VARCHAR(255)          not null,
-   "USER"               VARCHAR(255)          not null,
-   FLIGHT               VARCHAR(255)          not null,
+   ID                   VARCHAR2(36)          not null,
+   "USER"               VARCHAR2(36)          not null,
+   FLIGHT               VARCHAR2(36)          not null,
    constraint PK_TICKET primary key (ID)
 );
 
@@ -131,7 +131,7 @@ create table TICKET (
 /* Table: "USER"                                                */
 /*==============================================================*/
 create table "USER" (
-   ID                   VARCHAR(255)          not null,
+   ID                   VARCHAR2(36)          not null,
    FIRSTNAME            VARCHAR(255)          not null,
    LASTNAME             VARCHAR(255)          not null,
    BIRTHDATE            DATE                  not null,
@@ -144,9 +144,9 @@ create table "USER" (
 /* Table: USERROLE                                              */
 /*==============================================================*/
 create table USERROLE (
-   ID                   VARCHAR(255)          not null,
-   "USER"               VARCHAR(255)          not null,
-   ROLE                 VARCHAR(255)          not null,
+   ID                   VARCHAR2(36)          not null,
+   "USER"               VARCHAR2(36)          not null,
+   ROLE                 VARCHAR2(36)          not null,
    constraint PK_USERROLE primary key (ID)
 );
 
