@@ -396,3 +396,104 @@ create index IDX_FLIGHT_DATES on FLIGHT (SCHEDULED_DEPARTURE, SCHEDULED_ARRIVAL)
 create index IDX_BAGGAGE_TRACKING on BAGGAGE (TRACKING_NUMBER);
 create index IDX_USER_EMAIL on "USER" (EMAIL);
 create index IDX_TICKET_BOOKING on TICKET (BOOKING_DATE);
+
+/*==============================================================*/
+/* Extend AIRLINE table                                          */
+/*==============================================================*/
+alter table AIRLINE add (
+    IATA_CODE           VARCHAR2(2),
+    COUNTRY             VARCHAR2(255),
+    LOGO_URL            VARCHAR2(255),
+    ACTIVE              NUMBER(1) default 1,
+    constraint CK_AIRLINE_ACTIVE check (ACTIVE in (0,1))
+);
+
+/*==============================================================*/
+/* Extend AIRPORT table                                          */
+/*==============================================================*/
+alter table AIRPORT add (
+    IATA_CODE           VARCHAR2(3),
+    TIMEZONE            VARCHAR2(50),
+    ELEVATION           NUMBER,
+    NUMBER_OF_TERMINALS NUMBER,
+    LATITUDE            NUMBER(10,6),
+    LONGITUDE           NUMBER(10,6),
+    constraint UQ_AIRPORT_IATA unique (IATA_CODE)
+);
+
+/*==============================================================*/
+/* Extend TERMINAL table                                         */
+/*==============================================================*/
+alter table TERMINAL add (
+    CAPACITY            NUMBER,
+    STATUS              VARCHAR2(20) default 'ACTIVE',
+    FLOOR_COUNT         NUMBER,
+    SERVICES            VARCHAR2(1000),
+    OPENING_HOURS       VARCHAR2(255),
+    constraint CK_TERMINAL_STATUS check (STATUS in ('ACTIVE','MAINTENANCE','CLOSED'))
+);
+
+/*==============================================================*/
+/* Extend PILOT table                                            */
+/*==============================================================*/
+alter table PILOT add (
+    LICENSE_TYPE        VARCHAR2(50),
+    LICENSE_NUMBER      VARCHAR2(50),
+    LICENSE_EXPIRY      DATE,
+    FLIGHT_HOURS        NUMBER default 0,
+    MEDICAL_CHECK_DATE  DATE,
+    constraint UQ_PILOT_LICENSE unique (LICENSE_NUMBER)
+);
+
+/*==============================================================*/
+/* Extend SHOP table                                             */
+/*==============================================================*/
+alter table SHOP add (
+    OPENING_TIME        VARCHAR2(5),
+    CLOSING_TIME        VARCHAR2(5),
+    DESCRIPTION         VARCHAR2(1000),
+    IS_DUTY_FREE        NUMBER(1) default 0,
+    constraint CK_SHOP_DUTY_FREE check (IS_DUTY_FREE in (0,1))
+);
+
+/*==============================================================*/
+/* Extend HANGAR table                                           */
+/*==============================================================*/
+alter table HANGAR add (
+    CAPACITY            NUMBER,
+    SIZE_SQFT           NUMBER,
+    STATUS              VARCHAR2(20) default 'ACTIVE',
+    LAST_INSPECTION     DATE,
+    NEXT_INSPECTION     DATE,
+    constraint CK_HANGAR_STATUS check (STATUS in ('ACTIVE','MAINTENANCE','CLOSED'))
+);
+
+/*==============================================================*/
+/* Extend PLOT table                                             */
+/*==============================================================*/
+alter table PLOT add (
+    AREA_SQFT           NUMBER,
+    STATUS              VARCHAR2(20) default 'AVAILABLE',
+    LAST_MAINTENANCE    DATE,
+    MAX_WEIGHT_CAPACITY NUMBER,
+    UTILITIES_AVAILABLE VARCHAR2(255),
+    constraint CK_PLOT_STATUS check (STATUS in ('AVAILABLE','OCCUPIED','MAINTENANCE'))
+);
+
+/*==============================================================*/
+/* Extend SHOPTYPE table                                         */
+/*==============================================================*/
+alter table SHOPTYPE add (
+    CATEGORY            VARCHAR2(50),
+    SECURITY_LEVEL      VARCHAR2(20),
+    DESCRIPTION         VARCHAR2(1000),
+    TYPICAL_HOURS       VARCHAR2(100),
+    constraint CK_SHOPTYPE_SECURITY check (SECURITY_LEVEL in ('PRE_SECURITY','POST_SECURITY'))
+);
+
+/*==============================================================*/
+/* Create new indexes for better performance                     */
+/*==============================================================*/
+create index IDX_AIRLINE_IATA on AIRLINE (IATA_CODE);
+create index IDX_AIRPORT_IATA on AIRPORT (IATA_CODE);
+create index IDX_PILOT_LICENSE on PILOT (LICENSE_NUMBER);
