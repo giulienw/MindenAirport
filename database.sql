@@ -8,13 +8,13 @@ alter table BAGGAGE
    drop constraint FK_BAGGAGE_FLIGHT;
 
 alter table BAGGAGE
-   drop constraint FK_BAGGAGE_USER;
+   drop constraint FK_BAGGAGE_AIRPORTUSER;
 
 alter table FLIGHT
    drop constraint FK_FLIGHT_FROM_AIRPORT;
 
 alter table FLIGHT
-   drop constraint FK_FLIGHT_USER;
+   drop constraint FK_FLIGHT_AIRPORTUSER;
 
 alter table FLIGHT
    drop constraint FK_FLIGHT_PLANE;
@@ -47,7 +47,7 @@ alter table TICKET
    drop constraint FK_TICKET_FLIGHT;
 
 alter table TICKET
-   drop constraint FK_TICKET_USER;
+   drop constraint FK_TICKET_AIRPORTUSER;
 
 /* Drop existing tables */
 drop table AIRLINE cascade constraints;
@@ -63,7 +63,7 @@ drop table SHOP cascade constraints;
 drop table SHOPTYPE cascade constraints;
 drop table TERMINAL cascade constraints;
 drop table TICKET cascade constraints;
-drop table "USER" cascade constraints;
+drop table AIRPORTUSER cascade constraints;
 
 /* Drop new tables if they exist */
 drop table FLIGHT_STATUS cascade constraints;
@@ -78,7 +78,12 @@ drop table FLIGHT_CREW cascade constraints;
 create table AIRLINE (
    ID                   VARCHAR2(36)          not null,
    NAME                 VARCHAR2(255)         not null,
-   constraint PK_AIRLINE primary key (ID)
+   constraint PK_AIRLINE primary key (ID),
+   IATA_CODE           VARCHAR2(2),
+   COUNTRY             VARCHAR2(255),
+   LOGO_URL            VARCHAR2(255),
+   ACTIVE              NUMBER(1) default 1,
+   constraint CK_AIRLINE_ACTIVE check (ACTIVE in (0,1))
 );
 
 /*==============================================================*/
@@ -89,7 +94,14 @@ create table AIRPORT (
    NAME                 VARCHAR2(255),
    COUNTRY              VARCHAR2(255)         not null,
    CITY                 VARCHAR2(255)         not null,
-   constraint PK_AIRPORT primary key (ID)
+   constraint PK_AIRPORT primary key (ID),
+   IATA_CODE           VARCHAR2(3),
+   TIMEZONE            VARCHAR2(50),
+   ELEVATION           NUMBER,
+   NUMBER_OF_TERMINALS NUMBER,
+   LATITUDE            NUMBER(10,6),
+   LONGITUDE           NUMBER(10,6),
+   constraint UQ_AIRPORT_IATA unique (IATA_CODE)
 );
 
 /*==============================================================*/
@@ -117,7 +129,7 @@ create table TRAVEL_CLASS (
 /*==============================================================*/
 create table BAGGAGE (
    ID                   VARCHAR2(36)          not null,
-   "USER"               VARCHAR2(36)          not null,
+   AIRPORTUSER               VARCHAR2(36)          not null,
    FLIGHT               VARCHAR2(36)          not null,
    "SIZE"               INT                   not null,
    WEIGHT              NUMBER(5,2)           not null,
@@ -192,7 +204,13 @@ create table FLIGHT_CREW (
 create table HANGAR (
    ID                   VARCHAR2(36)          not null,
    PLOT                 VARCHAR2(36)          not null,
-   constraint PK_HANGAR primary key (ID)
+   constraint PK_HANGAR primary key (ID),
+   CAPACITY            NUMBER,
+   SIZE_SQFT           NUMBER,
+   STATUS              VARCHAR2(20) default 'ACTIVE',
+   LAST_INSPECTION     DATE,
+   NEXT_INSPECTION     DATE,
+   constraint CK_HANGAR_STATUS check (STATUS in ('ACTIVE','MAINTENANCE','CLOSED'))
 );
 
 /*==============================================================*/
@@ -202,7 +220,13 @@ create table PILOT (
    ID                   VARCHAR2(36)          not null,
    FIRSTNAME            VARCHAR2(255)         not null,
    LASTNAME             VARCHAR(255)          not null,
-   constraint PK_PILOT primary key (ID)
+   constraint PK_PILOT primary key (ID),
+   LICENSE_TYPE        VARCHAR2(50),
+   LICENSE_NUMBER      VARCHAR2(50),
+   LICENSE_EXPIRY      DATE,
+   FLIGHT_HOURS        NUMBER default 0,
+   MEDICAL_CHECK_DATE  DATE,
+   constraint UQ_PILOT_LICENSE unique (LICENSE_NUMBER)
 );
 
 /*==============================================================*/
@@ -230,7 +254,13 @@ create table PLOT (
    ID                   VARCHAR2(36)          not null,
    POSTITION            INT                   not null,
    TYPE                 VARCHAR2(36)          not null,
-   constraint PK_PLOT primary key (ID)
+   constraint PK_PLOT primary key (ID),
+   AREA_SQFT           NUMBER,
+   STATUS              VARCHAR2(20) default 'AVAILABLE',
+   LAST_MAINTENANCE    DATE,
+   MAX_WEIGHT_CAPACITY NUMBER,
+   UTILITIES_AVAILABLE VARCHAR2(255),
+   constraint CK_PLOT_STATUS check (STATUS in ('AVAILABLE','OCCUPIED','MAINTENANCE'))
 );
 
 /*==============================================================*/
@@ -251,7 +281,12 @@ create table SHOP (
    NAME                 VARCHAR2(255)         not null,
    TYPE                 VARCHAR2(36)          not null,
    PLOT                 VARCHAR2(36)          not null,
-   constraint PK_SHOP primary key (ID)
+   constraint PK_SHOP primary key (ID),
+   OPENING_TIME        VARCHAR2(5),
+   CLOSING_TIME        VARCHAR2(5),
+   DESCRIPTION         VARCHAR2(1000),
+   IS_DUTY_FREE        NUMBER(1) default 0,
+   constraint CK_SHOP_DUTY_FREE check (IS_DUTY_FREE in (0,1))
 );
 
 /*==============================================================*/
@@ -261,7 +296,12 @@ create table SHOPTYPE (
    ID                   VARCHAR2(36)          not null,
    NAME                 VARCHAR2(255)         not null,
    LABEL                VARCHAR2(255)         not null,
-   constraint PK_SHOPTYPE primary key (ID)
+   constraint PK_SHOPTYPE primary key (ID),
+   CATEGORY            VARCHAR2(50),
+   SECURITY_LEVEL      VARCHAR2(20),
+   DESCRIPTION         VARCHAR2(1000),
+   TYPICAL_HOURS       VARCHAR2(100),
+   constraint CK_SHOPTYPE_SECURITY check (SECURITY_LEVEL in ('PRE_SECURITY','POST_SECURITY'))
 );
 
 /*==============================================================*/
@@ -270,7 +310,13 @@ create table SHOPTYPE (
 create table TERMINAL (
    ID                   VARCHAR2(36)          not null,
    NAME                 VARCHAR2(255)         not null,
-   constraint PK_TERMINAL primary key (ID)
+   constraint PK_TERMINAL primary key (ID),
+   CAPACITY            NUMBER,
+   STATUS              VARCHAR2(20) default 'ACTIVE',
+   FLOOR_COUNT         NUMBER,
+   SERVICES            VARCHAR2(1000),
+   OPENING_HOURS       VARCHAR2(255),
+   constraint CK_TERMINAL_STATUS check (STATUS in ('ACTIVE','MAINTENANCE','CLOSED'))
 );
 
 /*==============================================================*/
@@ -278,7 +324,7 @@ create table TERMINAL (
 /*==============================================================*/
 create table TICKET (
    ID                   VARCHAR2(36)          not null,
-   "USER"               VARCHAR2(36)          not null,
+   AIRPORTUSER               VARCHAR2(36)          not null,
    FLIGHT               VARCHAR2(36)          not null,
    SEAT_NUMBER         VARCHAR2(10),
    TRAVEL_CLASS        VARCHAR2(36),
@@ -290,18 +336,19 @@ create table TICKET (
 );
 
 /*==============================================================*/
-/* Table: "USER"                                                */
+/* Table: AIRPORTUSER                                                */
 /*==============================================================*/
-create table "USER" (
+create table AIRPORTUSER (
    ID                   VARCHAR2(36)          not null,
    FIRSTNAME            VARCHAR2(255)         not null,
    LASTNAME             VARCHAR2(255)         not null,
    BIRTHDATE            DATE                  not null,
    PASSWORD             VARCHAR2(255)         not null,
-   ACTIVE               BINARY(1)             not null,
+   ACTIVE               NUMBER(1)             not null,
    EMAIL               VARCHAR2(255),
    PHONE               VARCHAR2(50),
-   constraint PK_USER primary key (ID)
+   constraint PK_AIRPORTUSER primary key (ID),
+   constraint CK_AIRPORTUSER_ACTIVE check (ACTIVE in (0,1))
 );
 
 /*==============================================================*/
@@ -313,15 +360,15 @@ alter table BAGGAGE
       references FLIGHT (ID);
 
 alter table BAGGAGE
-   add constraint FK_BAGGAGE_USER foreign key ("USER")
-      references "USER" (ID);
+   add constraint FK_BAGGAGE_AIRPORTUSER foreign key (AIRPORTUSER)
+      references AIRPORTUSER (ID);
 
 alter table FLIGHT
    add constraint FK_FLIGHT_FROM_AIRPORT foreign key ("FROM")
       references AIRPORT (ID);
 
 alter table FLIGHT
-   add constraint FK_FLIGHT_USER foreign key (PILOT)
+   add constraint FK_FLIGHT_AIRPORTUSER foreign key (PILOT)
       references PILOT (ID);
 
 alter table FLIGHT
@@ -381,8 +428,8 @@ alter table TICKET
       references FLIGHT (ID);
 
 alter table TICKET
-   add constraint FK_TICKET_USER foreign key ("USER")
-      references "USER" (ID);
+   add constraint FK_TICKET_AIRPORTUSER foreign key (AIRPORTUSER)
+      references AIRPORTUSER (ID);
 
 alter table TICKET
    add constraint FK_TICKET_TRAVEL_CLASS foreign key (TRAVEL_CLASS)
@@ -394,106 +441,8 @@ alter table TICKET
 
 create index IDX_FLIGHT_DATES on FLIGHT (SCHEDULED_DEPARTURE, SCHEDULED_ARRIVAL);
 create index IDX_BAGGAGE_TRACKING on BAGGAGE (TRACKING_NUMBER);
-create index IDX_USER_EMAIL on "USER" (EMAIL);
+create index IDX_AIRPORTUSER_EMAIL on AIRPORTUSER (EMAIL);
 create index IDX_TICKET_BOOKING on TICKET (BOOKING_DATE);
-
-/*==============================================================*/
-/* Extend AIRLINE table                                          */
-/*==============================================================*/
-alter table AIRLINE add (
-    IATA_CODE           VARCHAR2(2),
-    COUNTRY             VARCHAR2(255),
-    LOGO_URL            VARCHAR2(255),
-    ACTIVE              NUMBER(1) default 1,
-    constraint CK_AIRLINE_ACTIVE check (ACTIVE in (0,1))
-);
-
-/*==============================================================*/
-/* Extend AIRPORT table                                          */
-/*==============================================================*/
-alter table AIRPORT add (
-    IATA_CODE           VARCHAR2(3),
-    TIMEZONE            VARCHAR2(50),
-    ELEVATION           NUMBER,
-    NUMBER_OF_TERMINALS NUMBER,
-    LATITUDE            NUMBER(10,6),
-    LONGITUDE           NUMBER(10,6),
-    constraint UQ_AIRPORT_IATA unique (IATA_CODE)
-);
-
-/*==============================================================*/
-/* Extend TERMINAL table                                         */
-/*==============================================================*/
-alter table TERMINAL add (
-    CAPACITY            NUMBER,
-    STATUS              VARCHAR2(20) default 'ACTIVE',
-    FLOOR_COUNT         NUMBER,
-    SERVICES            VARCHAR2(1000),
-    OPENING_HOURS       VARCHAR2(255),
-    constraint CK_TERMINAL_STATUS check (STATUS in ('ACTIVE','MAINTENANCE','CLOSED'))
-);
-
-/*==============================================================*/
-/* Extend PILOT table                                            */
-/*==============================================================*/
-alter table PILOT add (
-    LICENSE_TYPE        VARCHAR2(50),
-    LICENSE_NUMBER      VARCHAR2(50),
-    LICENSE_EXPIRY      DATE,
-    FLIGHT_HOURS        NUMBER default 0,
-    MEDICAL_CHECK_DATE  DATE,
-    constraint UQ_PILOT_LICENSE unique (LICENSE_NUMBER)
-);
-
-/*==============================================================*/
-/* Extend SHOP table                                             */
-/*==============================================================*/
-alter table SHOP add (
-    OPENING_TIME        VARCHAR2(5),
-    CLOSING_TIME        VARCHAR2(5),
-    DESCRIPTION         VARCHAR2(1000),
-    IS_DUTY_FREE        NUMBER(1) default 0,
-    constraint CK_SHOP_DUTY_FREE check (IS_DUTY_FREE in (0,1))
-);
-
-/*==============================================================*/
-/* Extend HANGAR table                                           */
-/*==============================================================*/
-alter table HANGAR add (
-    CAPACITY            NUMBER,
-    SIZE_SQFT           NUMBER,
-    STATUS              VARCHAR2(20) default 'ACTIVE',
-    LAST_INSPECTION     DATE,
-    NEXT_INSPECTION     DATE,
-    constraint CK_HANGAR_STATUS check (STATUS in ('ACTIVE','MAINTENANCE','CLOSED'))
-);
-
-/*==============================================================*/
-/* Extend PLOT table                                             */
-/*==============================================================*/
-alter table PLOT add (
-    AREA_SQFT           NUMBER,
-    STATUS              VARCHAR2(20) default 'AVAILABLE',
-    LAST_MAINTENANCE    DATE,
-    MAX_WEIGHT_CAPACITY NUMBER,
-    UTILITIES_AVAILABLE VARCHAR2(255),
-    constraint CK_PLOT_STATUS check (STATUS in ('AVAILABLE','OCCUPIED','MAINTENANCE'))
-);
-
-/*==============================================================*/
-/* Extend SHOPTYPE table                                         */
-/*==============================================================*/
-alter table SHOPTYPE add (
-    CATEGORY            VARCHAR2(50),
-    SECURITY_LEVEL      VARCHAR2(20),
-    DESCRIPTION         VARCHAR2(1000),
-    TYPICAL_HOURS       VARCHAR2(100),
-    constraint CK_SHOPTYPE_SECURITY check (SECURITY_LEVEL in ('PRE_SECURITY','POST_SECURITY'))
-);
-
-/*==============================================================*/
-/* Create new indexes for better performance                     */
-/*==============================================================*/
 create index IDX_AIRLINE_IATA on AIRLINE (IATA_CODE);
 create index IDX_AIRPORT_IATA on AIRPORT (IATA_CODE);
 create index IDX_PILOT_LICENSE on PILOT (LICENSE_NUMBER);
