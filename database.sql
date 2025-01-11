@@ -76,10 +76,9 @@ drop table FLIGHT_CREW cascade constraints;
 /* Table: AIRLINE                                               */
 /*==============================================================*/
 create table AIRLINE (
-   ID                   VARCHAR2(36)          not null,
+   ID                   VARCHAR2(2)          not null,
    NAME                 VARCHAR2(255)         not null,
    constraint PK_AIRLINE primary key (ID),
-   IATA_CODE           VARCHAR2(2),
    COUNTRY             VARCHAR2(255),
    LOGO_URL            VARCHAR2(255),
    ACTIVE              NUMBER(1) default 1,
@@ -90,18 +89,16 @@ create table AIRLINE (
 /* Table: AIRPORT                                               */
 /*==============================================================*/
 create table AIRPORT (
-   ID                   VARCHAR2(36)          not null,
+   ID                   VARCHAR2(3)          not null,
    NAME                 VARCHAR2(255),
    COUNTRY              VARCHAR2(255)         not null,
    CITY                 VARCHAR2(255)         not null,
    constraint PK_AIRPORT primary key (ID),
-   IATA_CODE           VARCHAR2(3),
    TIMEZONE            VARCHAR2(50),
    ELEVATION           NUMBER,
    NUMBER_OF_TERMINALS NUMBER,
    LATITUDE            NUMBER(10,6),
-   LONGITUDE           NUMBER(10,6),
-   constraint UQ_AIRPORT_IATA unique (IATA_CODE)
+   LONGITUDE           NUMBER(10,6)
 );
 
 /*==============================================================*/
@@ -145,8 +142,8 @@ create table BAGGAGE (
 /*==============================================================*/
 create table FLIGHT (
    ID                   VARCHAR2(36)          not null,
-   "FROM"               VARCHAR2(36)          not null,
-   "TO"                 VARCHAR2(36)          not null,
+   "FROM"               VARCHAR2(3)          not null,
+   "TO"                 VARCHAR2(3)          not null,
    "DATE"               DATE                  not null,
    PILOT                VARCHAR2(36)          not null,
    PLANE                VARCHAR2(36)          not null,
@@ -237,7 +234,7 @@ create table PLANE (
    NAME                 VARCHAR2(255),
    MODEL                VARCHAR2(255)         not null,
    SEATS                NUMBER(10)            not null,
-   AIRLINE              VARCHAR2(36),
+   AIRLINE              VARCHAR2(2),
    HANGAR               VARCHAR2(36),
    MANUFACTURING_YEAR   NUMBER(4),
    MAX_TAKEOFF_WEIGHT  NUMBER(10,2),
@@ -443,6 +440,3 @@ create index IDX_FLIGHT_DATES on FLIGHT (SCHEDULED_DEPARTURE, SCHEDULED_ARRIVAL)
 create index IDX_BAGGAGE_TRACKING on BAGGAGE (TRACKING_NUMBER);
 create index IDX_AIRPORTUSER_EMAIL on AIRPORTUSER (EMAIL);
 create index IDX_TICKET_BOOKING on TICKET (BOOKING_DATE);
-create index IDX_AIRLINE_IATA on AIRLINE (IATA_CODE);
-create index IDX_AIRPORT_IATA on AIRPORT (IATA_CODE);
-create index IDX_PILOT_LICENSE on PILOT (LICENSE_NUMBER);
