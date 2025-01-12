@@ -363,7 +363,7 @@ alter table BAGGAGE
 
 alter table FLIGHT
    add constraint FK_FLIGHT_FROM_AIRPORT foreign key ("FROM")
-      references AIRPORT (ID);
+      references AIRPORT (IATA_CODE);
 
 alter table FLIGHT
    add constraint FK_FLIGHT_AIRPORTUSER foreign key (PILOT)
@@ -383,7 +383,7 @@ alter table FLIGHT
 
 alter table FLIGHT
    add constraint FK_FLIGHT_TO_AIRPORT foreign key ("TO")
-      references AIRPORT (ID);
+      references AIRPORT (IATA_CODE);
 
 alter table HANGAR
    add constraint FK_HANGAR_PLOT foreign key (PLOT)
@@ -403,7 +403,7 @@ alter table FLIGHT_CREW
 
 alter table PLANE
    add constraint FK_PLANE_AIRLINE foreign key (AIRLINE)
-      references AIRLINE (ID);
+      references AIRLINE (IATA_CODE);
 
 alter table PLANE
    add constraint FK_PLANE_HANGAR foreign key (HANGAR)
