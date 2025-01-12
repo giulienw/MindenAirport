@@ -76,10 +76,9 @@ drop table FLIGHT_CREW cascade constraints;
 /* Table: AIRLINE                                               */
 /*==============================================================*/
 create table AIRLINE (
-   ID                   VARCHAR2(36)          not null,
    NAME                 VARCHAR2(255)         not null,
-   constraint PK_AIRLINE primary key (ID),
    IATA_CODE           VARCHAR2(2),
+   constraint PK_AIRLINE primary key (IATA_CODE),
    COUNTRY             VARCHAR2(255),
    LOGO_URL            VARCHAR2(255),
    ACTIVE              NUMBER(1) default 1,
@@ -90,12 +89,11 @@ create table AIRLINE (
 /* Table: AIRPORT                                               */
 /*==============================================================*/
 create table AIRPORT (
-   ID                   VARCHAR2(36)          not null,
    NAME                 VARCHAR2(255),
    COUNTRY              VARCHAR2(255)         not null,
    CITY                 VARCHAR2(255)         not null,
-   constraint PK_AIRPORT primary key (ID),
    IATA_CODE           VARCHAR2(3),
+   constraint PK_AIRPORT primary key (IATA_CODE),
    TIMEZONE            VARCHAR2(50),
    ELEVATION           NUMBER,
    NUMBER_OF_TERMINALS NUMBER,
