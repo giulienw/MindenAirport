@@ -105,7 +105,7 @@ create table AIRPORT (
 /* Table: FLIGHT_STATUS                                          */
 /*==============================================================*/
 create table FLIGHT_STATUS (
-   ID                   VARCHAR2(36)          not null,
+   ID                   NUMBER                not null,
    NAME                 VARCHAR2(50)          not null,
    DESCRIPTION          VARCHAR2(255),
    constraint PK_FLIGHT_STATUS primary key (ID)
@@ -148,7 +148,7 @@ create table FLIGHT (
    PILOT                VARCHAR2(36)          not null,
    PLANE                VARCHAR2(36)          not null,
    TERMINAL             VARCHAR2(36),
-   STATUS               VARCHAR2(36),
+   STATUS               NUMBER,
    SCHEDULED_DEPARTURE  TIMESTAMP             not null,
    ACTUAL_DEPARTURE     TIMESTAMP,
    SCHEDULED_ARRIVAL    TIMESTAMP             not null,
@@ -365,7 +365,7 @@ alter table FLIGHT
       references AIRPORT (ID);
 
 alter table FLIGHT
-   add constraint FK_FLIGHT_AIRPORTUSER foreign key (PILOT)
+   add constraint FK_FLIGHT_PILOT foreign key (PILOT)
       references PILOT (ID);
 
 alter table FLIGHT
