@@ -115,7 +115,7 @@ create table FLIGHT_STATUS (
 /* Table: TRAVEL_CLASS                                           */
 /*==============================================================*/
 create table TRAVEL_CLASS (
-   ID                   VARCHAR2(36)          not null,
+   ID                   NUMBER          not null,
    NAME                 VARCHAR2(50)          not null,
    DESCRIPTION          VARCHAR2(255),
    constraint PK_TRAVEL_CLASS primary key (ID)
@@ -347,6 +347,20 @@ create table AIRPORTUSER (
    constraint CK_AIRPORTUSER_ACTIVE check (ACTIVE in (0,1))
 );
 
+create table PLANELICENSE (
+   ID                   VARCHAR2(36)          not null,
+   MODEL                VARCHAR2(36)         not null,
+   constraint PK_PLANELICENSE primary key (ID)
+)
+
+CREATE table PILOTLICENSE (
+   ID                  VARCHAR2(36)          not null,
+   PLANELICENSE        VARCHAR2(36)         not null,
+   PILOT               VARCHAR2(36)         not null,
+   constraint PK_PILOTLICENSE primary key (ID)
+)
+
+
 /*==============================================================*/
 /* Add Foreign Keys                                             */
 /*==============================================================*/
@@ -430,6 +444,14 @@ alter table TICKET
 alter table TICKET
    add constraint FK_TICKET_TRAVEL_CLASS foreign key (TRAVEL_CLASS)
       references TRAVEL_CLASS (ID);
+
+alter table PILOT
+   add constraint FK_PILOT_PILOTLICENSE foreign key (ID)
+      references PILOTLICENSE (PILOT);
+
+alter table PLANELICENSE
+   add constraint FK_PLANELICENSE_PILOTLICENSE foreign key (ID)
+      references PILOTLICENSE (PLANELICENSE);
 
 /*==============================================================*/
 /* Create Indexes                                               */
