@@ -20,7 +20,12 @@ func init() {
 func main() {
 
 	router := gin.Default()
-	routers.AirlineRoutes(router.Group("/airline"), db)
-	routers.AirportRoutes(router.Group("/airport"), db)
+	apiRouter := router.Group("/api")
+	routers.AirlineRoutes(apiRouter.Group("/airline"), db)
+	routers.AirportRoutes(apiRouter.Group("/airport"), db)
+	routers.FlightStatusRoutes(apiRouter.Group("/flightStatus"), db)
+	routers.FlightRoutes(apiRouter.Group("/flight"), db)
+	routers.TicketRoutes(apiRouter.Group("/ticket"), db)
+
 	router.Run("localhost:8080")
 }

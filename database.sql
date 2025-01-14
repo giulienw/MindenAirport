@@ -144,7 +144,6 @@ create table FLIGHT (
    ID                   VARCHAR2(36)          not null,
    "FROM"               VARCHAR2(3)          not null,
    "TO"                 VARCHAR2(3)          not null,
-   "DATE"               DATE                  not null,
    PILOT                VARCHAR2(36)          not null,
    PLANE                VARCHAR2(36)          not null,
    TERMINAL             VARCHAR2(36),
@@ -441,14 +440,14 @@ create index IDX_BAGGAGE_TRACKING on BAGGAGE (TRACKING_NUMBER);
 create index IDX_AIRPORTUSER_EMAIL on AIRPORTUSER (EMAIL);
 create index IDX_TICKET_BOOKING on TICKET (BOOKING_DATE);
 
-CREATE SEQUENCE _seq START WITH 1;
+CREATE SEQUENCE travel_class_seq START WITH 1;
 
 CREATE OR REPLACE TRIGGER travel_class_bir 
 BEFORE INSERT ON TRAVEL_CLASS 
 FOR EACH ROW
 
 BEGIN
-  SELECT travel_class_bir.NEXTVAL
+  SELECT travel_class_seq.NEXTVAL
   INTO   :new.id
   FROM   dual;
 END;

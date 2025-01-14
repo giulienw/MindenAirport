@@ -8,34 +8,6 @@ type TravelClass struct {
 	Description string `json:"description,omitempty"`
 }
 
-type Baggage struct {
-	ID              string  `json:"id"`
-	AirportUserID   string  `json:"airportUserId"`
-	FlightID        string  `json:"flightId"`
-	Size            int     `json:"size"`
-	Weight          float64 `json:"weight"`
-	TrackingNumber  string  `json:"trackingNumber"`
-	Status          string  `json:"status"`
-	SpecialHandling string  `json:"specialHandling,omitempty"`
-}
-
-type Flight struct {
-	ID                 string     `json:"id"`
-	From               string     `json:"from"`
-	To                 string     `json:"to"`
-	Date               time.Time  `json:"date"`
-	PilotID            string     `json:"pilotId"`
-	PlaneID            string     `json:"planeId"`
-	TerminalID         string     `json:"terminalId,omitempty"`
-	StatusID           string     `json:"statusId,omitempty"`
-	ScheduledDeparture time.Time  `json:"scheduledDeparture"`
-	ActualDeparture    *time.Time `json:"actualDeparture,omitempty"`
-	ScheduledArrival   time.Time  `json:"scheduledArrival"`
-	ActualArrival      *time.Time `json:"actualArrival,omitempty"`
-	Gate               string     `json:"gate,omitempty"`
-	BaggageClaim       string     `json:"baggageClaim,omitempty"`
-}
-
 type MaintenanceLog struct {
 	ID              string     `json:"id"`
 	PlaneID         string     `json:"planeId"`
@@ -141,17 +113,6 @@ type Terminal struct {
 	FloorCount   int    `json:"floorCount,omitempty"`
 	Services     string `json:"services,omitempty"`
 	OpeningHours string `json:"openingHours,omitempty"`
-}
-
-type Ticket struct {
-	ID            string    `json:"id"`
-	AirportUserID string    `json:"airportUserId"`
-	FlightID      string    `json:"flightId"`
-	SeatNumber    string    `json:"seatNumber,omitempty"`
-	TravelClassID string    `json:"travelClassId,omitempty"`
-	Price         float64   `json:"price,omitempty"`
-	BookingDate   time.Time `json:"bookingDate,omitempty"`
-	Status        string    `json:"status,omitempty"`
 }
 
 type AirportUser struct {
