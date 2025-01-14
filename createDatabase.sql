@@ -384,3 +384,29 @@ BEGIN
   FROM   dual;
 END;
 /
+
+CREATE SEQUENCE flight_status_seq START WITH 1;
+
+CREATE OR REPLACE TRIGGER flight_status_bir 
+BEFORE INSERT ON FLIGHT_STATUS 
+FOR EACH ROW
+
+BEGIN
+  SELECT flight_status_seq.NEXTVAL
+  INTO   :new.id
+  FROM   dual;
+END;
+/
+
+CREATE SEQUENCE plot_type_seq START WITH 1;
+
+CREATE OR REPLACE TRIGGER plot_type_bir 
+BEFORE INSERT ON PLOTTYPE 
+FOR EACH ROW
+
+BEGIN
+  SELECT plot_type_seq.NEXTVAL
+  INTO   :new.id
+  FROM   dual;
+END;
+/
