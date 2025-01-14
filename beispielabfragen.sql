@@ -81,13 +81,24 @@ SELECT ID, FIRSTNAME, LASTNAME, ROLE
 FROM CREW_MEMBER;
 
 
---SUBSELECT Gibt die meist genutzten Flugzeugmodelle der Airlines aus, aber nur bei activen Airlines
-SELECT AIRLINE.NAME AS Airline_Name, 
-(SELECT PLANE.MODEL 
-FROM FLIGHT
-JOIN PLANE ON FLIGHT.PLANE = PLANE.ID 
-WHERE PLANE.AIRLINE = AIRLINE.ID 
-GROUP BY PLANE.MODEL 
-ORDER BY COUNT(*) DESC FETCH FIRST 1 ROW ONLY ) AS Most_Used_Model FROM AIRLINE WHERE AIRLINE.ACTIVE = 1;
+--SUBSELECT: Die Abfrage sucht nach den meistgenutzten FlugzeugModellen der Airlines und sortiert diese alphabetisch nach den Airline Namen (nur aktive Airlines)
 
-FETCH FIRST 1 ROW ONLY  ==> Ein Subselect darf nur eine Zeile zurück geben 
+SELECT 
+    AIRLINE.NAME AS Airline_Name,
+    PLANE.MODEL AS Most_Used_Model
+FROM AIRLINE
+LEFT JOIN PLANE ON PLANE.AIRLINE = AIRLINE.ID
+LEFT JOIN FLIGHT ON FLIGHT.PLANE = PLANE.ID
+WHERE AIRLINE.ACTIVE = 1
+GROUP BY AIRLINE.ID, AIRLINE.NAME, PLANE.MODEL
+HAVING COUNT(FLIGHT.ID) = (
+    SELECT MAX(FLIGHT_COUNT)
+    FROM (
+        SELECT COUNT(*) AS FLIGHT_COUNT
+        FROM FLIGHT F
+        JOIN PLANE P ON F.PLANE = P.ID
+        WHERE P.AIRLINE = AIRLINE.ID
+        GROUP BY P.MODEL
+    )
+)
+ORDER BY Airline_Name;
