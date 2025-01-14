@@ -3,83 +3,13 @@
 /* Created on:     03.12.2024 10:28:13                          */
 /*==============================================================*/
 
-/* Drop existing foreign key constraints */
-alter table BAGGAGE
-   drop constraint FK_BAGGAGE_FLIGHT;
-
-alter table BAGGAGE
-   drop constraint FK_BAGGAGE_AIRPORTUSER;
-
-alter table FLIGHT
-   drop constraint FK_FLIGHT_FROM_AIRPORT;
-
-alter table FLIGHT
-   drop constraint FK_FLIGHT_AIRPORTUSER;
-
-alter table FLIGHT
-   drop constraint FK_FLIGHT_PLANE;
-
-alter table FLIGHT
-   drop constraint FK_FLIGHT_FK_FLIGHT_TERMINAL;
-
-alter table FLIGHT
-   drop constraint FK_FLIGHT_TO_AIRPORT;
-
-alter table HANGAR
-   drop constraint FK_HANGAR_PLOT;
-
-alter table PLANE
-   drop constraint FK_PLANE_AIRLINE;
-
-alter table PLANE
-   drop constraint FK_PLANE_HANGAR;
-
-alter table PLOT
-   drop constraint FK_PLOTS_PLOTTYPE;
-
-alter table SHOP
-   drop constraint FK_SHOPS_PLOTS;
-
-alter table SHOP
-   drop constraint FK_SHOPS_SHOPTYPE;
-
-alter table TICKET
-   drop constraint FK_TICKET_FLIGHT;
-
-alter table TICKET
-   drop constraint FK_TICKET_AIRPORTUSER;
-
-/* Drop existing tables */
-drop table AIRLINE cascade constraints;
-drop table AIRPORT cascade constraints;
-drop table BAGGAGE cascade constraints;
-drop table FLIGHT cascade constraints;
-drop table HANGAR cascade constraints;
-drop table PILOT cascade constraints;
-drop table PLANE cascade constraints;
-drop table PLOT cascade constraints;
-drop table PLOTTYPE cascade constraints;
-drop table SHOP cascade constraints;
-drop table SHOPTYPE cascade constraints;
-drop table TERMINAL cascade constraints;
-drop table TICKET cascade constraints;
-drop table AIRPORTUSER cascade constraints;
-
-/* Drop new tables if they exist */
-drop table FLIGHT_STATUS cascade constraints;
-drop table TRAVEL_CLASS cascade constraints;
-drop table MAINTENANCE_LOG cascade constraints;
-drop table CREW_MEMBER cascade constraints;
-drop table FLIGHT_CREW cascade constraints;
-
 /*==============================================================*/
 /* Table: AIRLINE                                               */
 /*==============================================================*/
 create table AIRLINE (
-   ID                   VARCHAR2(36)          not null,
+   ID                   VARCHAR2(2)          not null,
    NAME                 VARCHAR2(255)         not null,
    constraint PK_AIRLINE primary key (ID),
-   IATA_CODE           VARCHAR2(2),
    COUNTRY             VARCHAR2(255),
    LOGO_URL            VARCHAR2(255),
    ACTIVE              NUMBER(1) default 1,
@@ -90,25 +20,23 @@ create table AIRLINE (
 /* Table: AIRPORT                                               */
 /*==============================================================*/
 create table AIRPORT (
-   ID                   VARCHAR2(36)          not null,
+   ID                   VARCHAR2(3)          not null,
    NAME                 VARCHAR2(255),
    COUNTRY              VARCHAR2(255)         not null,
    CITY                 VARCHAR2(255)         not null,
    constraint PK_AIRPORT primary key (ID),
-   IATA_CODE           VARCHAR2(3),
    TIMEZONE            VARCHAR2(50),
    ELEVATION           NUMBER,
    NUMBER_OF_TERMINALS NUMBER,
    LATITUDE            NUMBER(10,6),
-   LONGITUDE           NUMBER(10,6),
-   constraint UQ_AIRPORT_IATA unique (IATA_CODE)
+   LONGITUDE           NUMBER(10,6)
 );
 
 /*==============================================================*/
 /* Table: FLIGHT_STATUS                                          */
 /*==============================================================*/
 create table FLIGHT_STATUS (
-   ID                   VARCHAR2(36)          not null,
+   ID                   NUMBER                not null,
    NAME                 VARCHAR2(50)          not null,
    DESCRIPTION          VARCHAR2(255),
    constraint PK_FLIGHT_STATUS primary key (ID)
@@ -118,7 +46,7 @@ create table FLIGHT_STATUS (
 /* Table: TRAVEL_CLASS                                           */
 /*==============================================================*/
 create table TRAVEL_CLASS (
-   ID                   VARCHAR2(36)          not null,
+   ID                   NUMBER          not null,
    NAME                 VARCHAR2(50)          not null,
    DESCRIPTION          VARCHAR2(255),
    constraint PK_TRAVEL_CLASS primary key (ID)
@@ -145,13 +73,12 @@ create table BAGGAGE (
 /*==============================================================*/
 create table FLIGHT (
    ID                   VARCHAR2(36)          not null,
-   "FROM"               VARCHAR2(36)          not null,
-   "TO"                 VARCHAR2(36)          not null,
-   "DATE"               DATE                  not null,
+   "FROM"               VARCHAR2(3)          not null,
+   "TO"                 VARCHAR2(3)          not null,
    PILOT                VARCHAR2(36)          not null,
    PLANE                VARCHAR2(36)          not null,
    TERMINAL             VARCHAR2(36),
-   STATUS               VARCHAR2(36),
+   STATUS               NUMBER,
    SCHEDULED_DEPARTURE  TIMESTAMP             not null,
    ACTUAL_DEPARTURE     TIMESTAMP,
    SCHEDULED_ARRIVAL    TIMESTAMP             not null,
@@ -237,7 +164,7 @@ create table PLANE (
    NAME                 VARCHAR2(255),
    MODEL                VARCHAR2(255)         not null,
    SEATS                NUMBER(10)            not null,
-   AIRLINE              VARCHAR2(36),
+   AIRLINE              VARCHAR2(2),
    HANGAR               VARCHAR2(36),
    MANUFACTURING_YEAR   NUMBER(4),
    MAX_TAKEOFF_WEIGHT  NUMBER(10,2),
@@ -252,8 +179,8 @@ create table PLANE (
 /*==============================================================*/
 create table PLOT (
    ID                   VARCHAR2(36)          not null,
-   POSTITION            INT                   not null,
-   TYPE                 VARCHAR2(36)          not null,
+   POSITION            INT                   not null,
+   TYPE                 NUMBER          not null,
    constraint PK_PLOT primary key (ID),
    AREA_SQFT           NUMBER,
    STATUS              VARCHAR2(20) default 'AVAILABLE',
@@ -267,7 +194,7 @@ create table PLOT (
 /* Table: PLOTTYPE                                              */
 /*==============================================================*/
 create table PLOTTYPE (
-   ID                   VARCHAR2(36)          not null,
+   ID                   NUMBER          not null,
    NAME                 VARCHAR2(255)         not null,
    LABEL                VARCHAR2(255)         not null,
    constraint PK_PLOTTYPE primary key (ID)
@@ -327,7 +254,7 @@ create table TICKET (
    AIRPORTUSER               VARCHAR2(36)          not null,
    FLIGHT               VARCHAR2(36)          not null,
    SEAT_NUMBER         VARCHAR2(10),
-   TRAVEL_CLASS        VARCHAR2(36),
+   TRAVEL_CLASS        NUMBER,
    PRICE              NUMBER(10,2),
    BOOKING_DATE       TIMESTAMP             default CURRENT_TIMESTAMP,
    STATUS             VARCHAR2(20)          default 'CONFIRMED',
@@ -351,6 +278,7 @@ create table AIRPORTUSER (
    constraint CK_AIRPORTUSER_ACTIVE check (ACTIVE in (0,1))
 );
 
+
 /*==============================================================*/
 /* Add Foreign Keys                                             */
 /*==============================================================*/
@@ -368,7 +296,7 @@ alter table FLIGHT
       references AIRPORT (ID);
 
 alter table FLIGHT
-   add constraint FK_FLIGHT_AIRPORTUSER foreign key (PILOT)
+   add constraint FK_FLIGHT_PILOT foreign key (PILOT)
       references PILOT (ID);
 
 alter table FLIGHT
@@ -443,6 +371,16 @@ create index IDX_FLIGHT_DATES on FLIGHT (SCHEDULED_DEPARTURE, SCHEDULED_ARRIVAL)
 create index IDX_BAGGAGE_TRACKING on BAGGAGE (TRACKING_NUMBER);
 create index IDX_AIRPORTUSER_EMAIL on AIRPORTUSER (EMAIL);
 create index IDX_TICKET_BOOKING on TICKET (BOOKING_DATE);
-create index IDX_AIRLINE_IATA on AIRLINE (IATA_CODE);
-create index IDX_AIRPORT_IATA on AIRPORT (IATA_CODE);
-create index IDX_PILOT_LICENSE on PILOT (LICENSE_NUMBER);
+
+CREATE SEQUENCE travel_class_seq START WITH 1;
+
+CREATE OR REPLACE TRIGGER travel_class_bir 
+BEFORE INSERT ON TRAVEL_CLASS 
+FOR EACH ROW
+
+BEGIN
+  SELECT travel_class_seq.NEXTVAL
+  INTO   :new.id
+  FROM   dual;
+END;
+/
