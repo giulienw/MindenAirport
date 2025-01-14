@@ -3,75 +3,6 @@
 /* Created on:     03.12.2024 10:28:13                          */
 /*==============================================================*/
 
-/* Drop existing foreign key constraints */
-alter table BAGGAGE
-   drop constraint FK_BAGGAGE_FLIGHT;
-
-alter table BAGGAGE
-   drop constraint FK_BAGGAGE_AIRPORTUSER;
-
-alter table FLIGHT
-   drop constraint FK_FLIGHT_FROM_AIRPORT;
-
-alter table FLIGHT
-   drop constraint FK_FLIGHT_AIRPORTUSER;
-
-alter table FLIGHT
-   drop constraint FK_FLIGHT_PLANE;
-
-alter table FLIGHT
-   drop constraint FK_FLIGHT_FK_FLIGHT_TERMINAL;
-
-alter table FLIGHT
-   drop constraint FK_FLIGHT_TO_AIRPORT;
-
-alter table HANGAR
-   drop constraint FK_HANGAR_PLOT;
-
-alter table PLANE
-   drop constraint FK_PLANE_AIRLINE;
-
-alter table PLANE
-   drop constraint FK_PLANE_HANGAR;
-
-alter table PLOT
-   drop constraint FK_PLOTS_PLOTTYPE;
-
-alter table SHOP
-   drop constraint FK_SHOPS_PLOTS;
-
-alter table SHOP
-   drop constraint FK_SHOPS_SHOPTYPE;
-
-alter table TICKET
-   drop constraint FK_TICKET_FLIGHT;
-
-alter table TICKET
-   drop constraint FK_TICKET_AIRPORTUSER;
-
-/* Drop existing tables */
-drop table AIRLINE cascade constraints;
-drop table AIRPORT cascade constraints;
-drop table BAGGAGE cascade constraints;
-drop table FLIGHT cascade constraints;
-drop table HANGAR cascade constraints;
-drop table PILOT cascade constraints;
-drop table PLANE cascade constraints;
-drop table PLOT cascade constraints;
-drop table PLOTTYPE cascade constraints;
-drop table SHOP cascade constraints;
-drop table SHOPTYPE cascade constraints;
-drop table TERMINAL cascade constraints;
-drop table TICKET cascade constraints;
-drop table AIRPORTUSER cascade constraints;
-
-/* Drop new tables if they exist */
-drop table FLIGHT_STATUS cascade constraints;
-drop table TRAVEL_CLASS cascade constraints;
-drop table MAINTENANCE_LOG cascade constraints;
-drop table CREW_MEMBER cascade constraints;
-drop table FLIGHT_CREW cascade constraints;
-
 /*==============================================================*/
 /* Table: AIRLINE                                               */
 /*==============================================================*/
@@ -248,8 +179,8 @@ create table PLANE (
 /*==============================================================*/
 create table PLOT (
    ID                   VARCHAR2(36)          not null,
-   POSTITION            INT                   not null,
-   TYPE                 VARCHAR2(36)          not null,
+   POSITION            INT                   not null,
+   TYPE                 NUMBER          not null,
    constraint PK_PLOT primary key (ID),
    AREA_SQFT           NUMBER,
    STATUS              VARCHAR2(20) default 'AVAILABLE',
@@ -263,7 +194,7 @@ create table PLOT (
 /* Table: PLOTTYPE                                              */
 /*==============================================================*/
 create table PLOTTYPE (
-   ID                   VARCHAR2(36)          not null,
+   ID                   NUMBER          not null,
    NAME                 VARCHAR2(255)         not null,
    LABEL                VARCHAR2(255)         not null,
    constraint PK_PLOTTYPE primary key (ID)
@@ -323,7 +254,7 @@ create table TICKET (
    AIRPORTUSER               VARCHAR2(36)          not null,
    FLIGHT               VARCHAR2(36)          not null,
    SEAT_NUMBER         VARCHAR2(10),
-   TRAVEL_CLASS        VARCHAR2(36),
+   TRAVEL_CLASS        NUMBER,
    PRICE              NUMBER(10,2),
    BOOKING_DATE       TIMESTAMP             default CURRENT_TIMESTAMP,
    STATUS             VARCHAR2(20)          default 'CONFIRMED',
@@ -346,19 +277,6 @@ create table AIRPORTUSER (
    constraint PK_AIRPORTUSER primary key (ID),
    constraint CK_AIRPORTUSER_ACTIVE check (ACTIVE in (0,1))
 );
-
-create table PLANELICENSE (
-   ID                   VARCHAR2(36)          not null,
-   MODEL                VARCHAR2(36)         not null,
-   constraint PK_PLANELICENSE primary key (ID)
-)
-
-CREATE table PILOTLICENSE (
-   ID                  VARCHAR2(36)          not null,
-   PLANELICENSE        VARCHAR2(36)         not null,
-   PILOT               VARCHAR2(36)         not null,
-   constraint PK_PILOTLICENSE primary key (ID)
-)
 
 
 /*==============================================================*/
@@ -445,14 +363,6 @@ alter table TICKET
    add constraint FK_TICKET_TRAVEL_CLASS foreign key (TRAVEL_CLASS)
       references TRAVEL_CLASS (ID);
 
-alter table PILOT
-   add constraint FK_PILOT_PILOTLICENSE foreign key (ID)
-      references PILOTLICENSE (PILOT);
-
-alter table PLANELICENSE
-   add constraint FK_PLANELICENSE_PILOTLICENSE foreign key (ID)
-      references PILOTLICENSE (PLANELICENSE);
-
 /*==============================================================*/
 /* Create Indexes                                               */
 /*==============================================================*/
@@ -473,3 +383,4 @@ BEGIN
   INTO   :new.id
   FROM   dual;
 END;
+/
