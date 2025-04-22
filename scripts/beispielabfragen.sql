@@ -1,4 +1,4 @@
--- Alle Flugzeuge der Lufthansa
+-- Alle Flugzeuge der Lufthansa.
 SELECT PLANE.MODEL, AIRLINE.NAME
 FROM PLANE JOIN AIRLINE ON PLANE.AIRLINE = AIRLINE.ID
 WHERE AIRLINE.NAME = 'Lufthansa';
