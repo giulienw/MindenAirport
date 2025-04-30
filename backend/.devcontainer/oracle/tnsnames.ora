@@ -1,0 +1,22 @@
+LISTENER_ORCL =
+  (ADDRESS = (PROTOCOL = TCP)(HOST = rs03-db-inf-min.ad.fh-bielefeld.de)(PORT = 1521))
+
+ORACLR_CONNECTION_DATA =
+  (DESCRIPTION =
+    (ADDRESS_LIST =
+      (ADDRESS = (PROTOCOL = IPC)(KEY = EXTPROC1521))
+    )
+    (CONNECT_DATA =
+      (SID = CLRExtProc)
+      (PRESENTATION = RO)
+    )
+  )
+
+ORCL =
+  (DESCRIPTION =
+    (ADDRESS = (PROTOCOL = TCP)(HOST = rs03-db-inf-min.ad.fh-bielefeld.de)(PORT = 1521))
+    (CONNECT_DATA =
+      (SERVER = DEDICATED)
+      (SERVICE_NAME = orcl.rs03-db-inf-min.ad.fh-bielefeld.de)
+    )
+  )
