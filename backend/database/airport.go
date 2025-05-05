@@ -8,7 +8,7 @@ import (
 func (db Database) GetAirports() []models.Airport {
 	var airports []models.Airport
 
-	rows, err := db.Query("SELECT * FROM Airports")
+	rows, err := db.Query("SELECT * FROM Airport")
 	if err != nil {
 		log.Fatal("Error querying the database:", err)
 	}
@@ -29,7 +29,7 @@ func (db Database) GetAirports() []models.Airport {
 func (db Database) GetAirportByID(id string) models.Airport {
 	var airport models.Airport
 
-	err := db.QueryRow("SELECT * FROM Airport WHERE ID = :1", id).Scan(&airport.ID, &airport.Name, &airport.Country, &airport.City, &airport.Timezone, &airport.Elevation, &airport.NumberOfTerminal, &airport.Latitude, &airport.Longitude)
+	err := db.QueryRow("SELECT * FROM AIRPORT WHERE ID = :1", id).Scan(&airport.ID, &airport.Name, &airport.Country, &airport.City, &airport.Timezone, &airport.Elevation, &airport.NumberOfTerminal, &airport.Latitude, &airport.Longitude)
 	if err != nil {
 		log.Fatal("Error querying the database:", err)
 	}

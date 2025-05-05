@@ -40,6 +40,6 @@ func GetAirportByID(db database.Database) gin.HandlerFunc {
 }
 
 func AirportRoutes(router *gin.RouterGroup, db database.Database) {
-	router.GET("/", GetAirportByID(db))
-	router.GET("/:id", GetAirports(db))
+	router.GET("/", GetAirports(db))
+	router.GET("/:id", GetAirportByID(db))
 }
