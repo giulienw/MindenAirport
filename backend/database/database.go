@@ -18,7 +18,12 @@ func CreateConnection() Database {
 		log.Fatal("Error connecting to the database:", err)
 	}
 
-	fmt.Println("Successfully connected to Oracle Database!")
+	err = db.Ping()
+	if err != nil {
+		log.Fatal("Error pinging the database:", err)
+	} else {
+		fmt.Println("Successfully connected to Oracle Database!")
+	}
 
 	return Database{db}
 }
