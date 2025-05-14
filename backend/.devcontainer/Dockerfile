@@ -13,5 +13,6 @@ RUN apt update && apt install -y libaio1 unzip && \
     rm instantclient-sqlplus-linux.x64-23.7.0.25.01.zip && \
     mkdir -p /opt/oracle/instantclient_23_7/network/admin &&  \
     mkdir -p /oracle 
-ENV LD_LIBRARY_PATH=/opt/oracle/instantclient_23_7:$LD_LIBRARY_PATH 
+ENV LD_LIBRARY_PATH=/opt/oracle/instantclient_23_7:$LD_LIBRARY_PATH
+ENV PATH=/opt/oracle/instantclient_23_7:$PATH
 COPY oracle/tnsnames.ora /opt/oracle/instantclient_23_7/network/admin/tnsnames.ora
