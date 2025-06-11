@@ -410,3 +410,24 @@ BEGIN
   FROM   dual;
 END;
 /
+
+/*==============================================================*/
+/* Create Views                                                 */
+/*==============================================================*/
+
+CREATE VIEW GetAirlines AS
+SELECT ID,NAME,COUNTRY,LOGO_URL,ACTIVE
+FROM airline;
+
+CREATE VIEW GetAirports AS
+SELECT * FROM Airport;
+
+CREATE VIEW GetFlights AS
+SELECT * FROM flight;
+
+CREATE VIEW GetFlightStatuses AS
+SELECT ID,NAME,DESCRIPTION
+FROM flight_status;
+
+CREATE VIEW GetMaintenanceLog AS
+SELECT * FROM maintenance_log;

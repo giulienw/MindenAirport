@@ -70,3 +70,10 @@ drop table FLIGHT_CREW cascade constraints;
 drop sequence travel_class_seq;
 drop sequence flight_status_seq;
 drop sequence plot_type_seq;
+
+/* Drop Views */
+drop view GETAIRLINES;
+drop view GETAIRPORTS;
+drop view GETFLIGHTS;
+drop view GETFLIGHTSTATUSES;
+drop view GETMAINTENANCELOG;
