@@ -1,0 +1,7 @@
+@import "tailwindcss";
+
+@layer utilities {
+  .animate-spin-slow {
+    animation: spin 6s linear infinite;
+  }
+}
