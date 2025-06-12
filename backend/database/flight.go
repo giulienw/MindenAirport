@@ -1,7 +1,6 @@
 package database
 
 import (
-	"fmt"
 	"log"
 	"mindenairport/models"
 )
@@ -34,7 +33,6 @@ func (db Database) GetFlights() []models.Flight {
 		}
 		flights = append(flights, flight)
 	}
-	fmt.Println("Retrieved flights:", len(flights))
 	return flights
 }
 
