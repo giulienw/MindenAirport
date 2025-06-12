@@ -1,7 +1,10 @@
 import { useState } from 'react'
-import { Link } from 'react-router'
+import { Link, useNavigate } from 'react-router'
+import { useAuth } from '@/hooks'
 
 function Register() {
+  const navigate = useNavigate()
+  const { register, loading: isRegistering } = useAuth()
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
@@ -64,12 +67,29 @@ function Register() {
     return Object.keys(newErrors).length === 0
   }
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     
-    if (validateForm()) {
-      // Handle registration logic here
-      console.log('Registration submitted:', formData)
+    if (!validateForm()) {
+      return
+    }
+
+    try {
+      await register({
+        firstName: formData.firstName,
+        lastName: formData.lastName,
+        email: formData.email,
+        password: formData.password,
+      })
+
+      // Registration successful, redirect to dashboard (user is now logged in)
+      navigate('/dashboard', { 
+        state: { message: 'Registration successful! Welcome to MindenAirport.' }
+      })
+    } catch (error) {
+      setErrors({ 
+        general: error instanceof Error ? error.message : 'Registration failed. Please try again.'
+      })
     }
   }
 
@@ -100,6 +120,21 @@ function Register() {
           {/* Form */}
           <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
             <div className="bg-white px-8 py-8 shadow-lg rounded-lg">
+              {/* General Error */}
+              {errors.general && (
+                <div className="mb-6 bg-red-50 border border-red-200 rounded-md p-4">
+                  <div className="flex">
+                    <div className="text-red-600">
+                      <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                    </div>
+                    <div className="ml-3">
+                      <p className="text-sm font-medium text-red-800">{errors.general}</p>
+                    </div>
+                  </div>
+                </div>
+              )}
               <div className="space-y-6">
                 {/* Name Fields */}
                 <div className="grid grid-cols-2 gap-4">
@@ -260,9 +295,20 @@ function Register() {
               <div className="mt-6">
                 <button
                   type="submit"
-                  className="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-colors duration-200"
+                  disabled={isRegistering}
+                  className="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  Create account
+                  {isRegistering ? (
+                    <>
+                      <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                      </svg>
+                      Creating account...
+                    </>
+                  ) : (
+                    'Create account'
+                  )}
                 </button>
               </div>
 

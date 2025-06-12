@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { Link } from "react-router";
 import { FlightBoard } from "@/components/flight";
 import { useFlights } from "@/hooks";
 import { Plane, Clock, MapPin, Users } from "lucide-react";
@@ -38,23 +39,31 @@ function Home() {
                 Welcome to Minden Airport - Your Gateway to the World
               </p>
             </div>
-            <div className="mt-4 md:mt-0 text-right">
-              <div className="text-2xl font-mono">
-                {currentTime.toLocaleTimeString('en-US', {
-                  hour: '2-digit',
-                  minute: '2-digit',
-                  second: '2-digit',
-                  hour12: false,
-                })}
+            <div className="mt-4 md:mt-0 flex flex-col items-end space-y-2">
+              <div className="text-right">
+                <div className="text-2xl font-mono">
+                  {currentTime.toLocaleTimeString('en-US', {
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    second: '2-digit',
+                    hour12: false,
+                  })}
+                </div>
+                <div className="text-blue-100">
+                  {currentTime.toLocaleDateString('en-US', {
+                    weekday: 'long',
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric',
+                  })}
+                </div>
               </div>
-              <div className="text-blue-100">
-                {currentTime.toLocaleDateString('en-US', {
-                  weekday: 'long',
-                  year: 'numeric',
-                  month: 'long',
-                  day: 'numeric',
-                })}
-              </div>
+              <Link 
+                to="/login" 
+                className="bg-white text-blue-600 hover:bg-blue-50 px-4 py-2 rounded-md text-sm font-medium transition-colors"
+              >
+                My Tickets
+              </Link>
             </div>
           </div>
         </div>

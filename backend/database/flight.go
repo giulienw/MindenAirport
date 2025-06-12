@@ -27,7 +27,7 @@ func (db Database) GetFlights() []models.Flight {
 
 	for rows.Next() {
 		var flight models.Flight
-		err := rows.Scan(&flight.ID, &flight.From, &flight.To, &flight.Date, &flight.PilotID, &flight.PlaneID, &flight.TerminalID, &flight.StatusID, &flight.ScheduledDeparture, &flight.ActualDeparture, &flight.ScheduledArrival, &flight.ActualArrival, &flight.Gate, &flight.BaggageClaim)
+		err := rows.Scan(&flight.ID, &flight.From, &flight.To, &flight.PilotID, &flight.PlaneID, &flight.TerminalID, &flight.StatusID, &flight.ScheduledDeparture, &flight.ActualDeparture, &flight.ScheduledArrival, &flight.ActualArrival, &flight.Gate, &flight.BaggageClaim)
 		if err != nil {
 			log.Fatal("Error scanning the database:", err)
 		}

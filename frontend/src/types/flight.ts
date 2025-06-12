@@ -5,8 +5,9 @@ export interface Flight {
   date: string;
   pilotId: string;
   planeId: string;
+  airlineId: string;
   terminalId?: string;
-  status?: string;
+  statusId?: string;
   scheduledDeparture: string;
   actualDeparture?: string;
   scheduledArrival: string;
