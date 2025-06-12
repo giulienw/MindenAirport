@@ -7,8 +7,7 @@ import type {
   UserDashboard,
 } from "@/types";
 import { flightService } from "./flightService";
-
-const API_BASE_URL = "http://127.0.0.1/api";
+import { API_BASE_URL } from "@/config";
 
 export const authService = {
   async login(credentials: LoginCredentials): Promise<AuthResponse> {
