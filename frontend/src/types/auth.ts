@@ -1,10 +1,12 @@
 export interface User {
   id: string
-  email: string
+  email?: string
   firstName: string
   lastName: string
-  createdAt: string
-  updatedAt: string
+  birthDate?: string
+  password?: string
+  active: boolean
+  phone?: string
 }
 
 export interface LoginCredentials {
