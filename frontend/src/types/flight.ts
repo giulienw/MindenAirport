@@ -7,7 +7,7 @@ export interface Flight {
   planeId: string;
   airlineId: string;
   terminalId?: string;
-  status?: string;
+  statusId?: string;
   scheduledDeparture: string;
   actualDeparture?: string;
   scheduledArrival: string;
