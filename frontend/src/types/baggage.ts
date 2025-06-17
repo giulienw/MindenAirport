@@ -1,6 +1,6 @@
 export interface BaggageItem {
   id: string;
-  ticketId: string;
+  flightId: string;
   type: BaggageType;
   weight?: number;
   status: BaggageStatus;
