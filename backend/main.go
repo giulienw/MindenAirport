@@ -46,10 +46,15 @@ func main() {
 	routers.FlightStatusRoutes(apiRouter.Group("/flightStatus"), db)
 	routers.FlightRoutes(apiRouter.Group("/flight"), db)
 
+	// Public baggage tracking
+	publicBaggage := apiRouter.Group("/baggage")
+	publicBaggage.GET("/track", routers.GetBaggageByTrackingNumber(db))
+
 	// Protected routes (require authentication)
 	protected := apiRouter.Group("/")
 	protected.Use(middleware.AuthMiddleware())
 	routers.TicketRoutes(protected.Group("/ticket"), db)
+	routers.BaggageRoutes(protected.Group("/baggage"), db)
 
 	// Protected auth routes
 	authProtected := apiRouter.Group("/auth")
