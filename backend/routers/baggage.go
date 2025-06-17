@@ -146,11 +146,6 @@ func CreateBaggage(db database.Database) gin.HandlerFunc {
 			return
 		}
 
-		// Set default status if not provided
-		if baggage.Status == "" {
-			baggage.Status = "CHECKED_IN"
-		}
-
 		// Create the baggage
 		createdBaggage, err := db.CreateBaggage(baggage)
 		if err != nil {
