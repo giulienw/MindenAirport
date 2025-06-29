@@ -433,7 +433,7 @@ CREATE VIEW GetMaintenanceLog AS
 SELECT * FROM maintenance_log;
 
 /*==============================================================*/
-/* Create Views                                                 */
+/* Create Prozedures                                            */
 /*==============================================================*/
 
 CREATE PROCEDURE getAirlineByID (id VARCHAR2)
