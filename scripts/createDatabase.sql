@@ -431,3 +431,17 @@ FROM flight_status;
 
 CREATE VIEW GetMaintenanceLog AS
 SELECT * FROM maintenance_log;
+
+/*==============================================================*/
+/* Create Views                                                 */
+/*==============================================================*/
+
+/* Get GetAirlineByID */
+
+CREATE PROCEDURE getAirlineByID (
+   ID VARCHAR2
+)
+AS
+BEGIN
+   SELECT * FROM airline WHERE id =ID;
+END;
