@@ -57,7 +57,7 @@ create table TRAVEL_CLASS (
 /*==============================================================*/
 create table BAGGAGE (
    ID                   VARCHAR2(36)          not null,
-   AIRPORTUSER               VARCHAR2(36)          not null,
+   AIRPORTUSER          VARCHAR2(36)          not null,
    FLIGHT               VARCHAR2(36)          not null,
    "SIZE"               INT                   not null,
    WEIGHT              NUMBER(5,2)           not null,
@@ -436,12 +436,111 @@ SELECT * FROM maintenance_log;
 /* Create Views                                                 */
 /*==============================================================*/
 
-/* Get GetAirlineByID */
-
-CREATE PROCEDURE getAirlineByID (
-   ID VARCHAR2
-)
+CREATE PROCEDURE getAirlineByID (id VARCHAR2)
 AS
 BEGIN
-   SELECT * FROM airline WHERE id =ID;
+   SELECT * FROM airline WHERE ID =id;
 END;
+/
+
+CREATE PROCEDURE getAirportByID (id VARCHAR2)
+AS
+BEGIN
+   SELECT * FROM AIRPORT WHERE ID = id;
+END;
+/
+
+CREATE PROCEDURE getUserByEmail (email VARCHAR2)
+AS   
+BEGIN
+   SELECT ID, FIRSTNAME, LASTNAME, BIRTHDATE, PASSWORD, ACTIVE, EMAIL, PHONE 
+			  FROM AIRPORTUSER WHERE EMAIL = email;
+END;
+/
+
+CREATE PROCEDURE getUserById (id VARCHAR2)
+AS
+BEGIN 
+   SELECT ID, FIRSTNAME, LASTNAME, BIRTHDATE, PASSWORD, ACTIVE, EMAIL, PHONE 
+			  FROM AIRPORTUSER WHERE ID = id;
+END;
+/
+
+CREATE PROCEDURE createUser(id VARCHAR2, firstName VARCHAR2, lastName VARCHAR2, birthdate DATE, password VARCHAR2, active NUMBER, email VARCHAR2, phone VARCHAR2)
+AS
+BEGIN
+   INSERT INTO AIRPORTUSER (ID, FIRSTNAME, LASTNAME, BIRTHDATE, PASSWORD, ACTIVE, EMAIL, PHONE) 
+			  VALUES (id, firstName, lastName, birthdate, password, active, email, phone);
+END;
+/
+
+/* Node: In der Funktion UpdateLastLogin in auth.go wird LAST_LOGIN gesetzt. In AirportUser gibt es aber kein LAST_LOGIN */
+CREATE PROCEDURE updateLastLogin(last_login VARCHAR2 , id VARCHAR2)
+AS
+BEGIN
+   UPDATE AIRPORTUSER SET LAST_LOGIN = last_login WHERE ID = id;
+END;
+/
+
+CREATE PROCEDURE deactivateUser(id VARCHAR2)
+AS 
+BEGIN
+   UPDATE AIRPORTUSER SET ACTIVE = 0 WHERE ID = id;
+END;
+/
+
+CREATE PROCEDURE checkEmailExists(email VARCHAR2)
+AS
+BEGIN
+   SELECT COUNT(*) FROM AIRPORTUSER WHERE EMAIL = email;
+END;
+/
+
+CREATE PROCEDURE getBaggabeByID(id VARCHAR2)
+AS
+BEGIN
+   SELECT ID, AIRPORTUSER, FLIGHT, SIZE, WEIGHT, TRACKING_NUMBER, STATUS, SPECIAL_HANDLING 
+			  FROM BAGGAGE WHERE ID = id;
+END;
+/
+
+CREATE PROCEDURE getBaggabeByUserID(userID VARCHAR2)
+AS
+BEGIN
+   SELECT * FROM BAGGAGE WHERE AIRPORTUSER = userID ORDER BY ID DESC;
+END;
+/
+
+CREATE PROCEDURE getBaggaeByFlightID(flightID VARCHAR2)
+AS
+BEGIN
+   SELECT ID, AIRPORTUSER, FLIGHT, SIZE, WEIGHT, TRACKING_NUMBER, STATUS, SPECIAL_HANDLING 
+			  FROM BAGGAGE WHERE FLIGHT = flightID ORDER BY ID DESC;
+END;
+/
+
+CREATE PROCEDURE createBaggage(id VARCHAR2, airportUser VARCHAR2, flight VARCHAR2, size INT, weight NUMBER, tracking_Number VARCHAR2, status VARCHAR2, special_Handling VARCHAR2)
+AS
+BEGIN
+   INSERT INTO BAGGAGE (ID, AIRPORTUSER, FLIGHT, SIZE, WEIGHT, TRACKING_NUMBER, STATUS, SPECIAL_HANDLING)
+			  VALUES (id, airportUser, flight, size, weight, tracking_Number, status, special_Handling);
+END;
+/
+
+CREATE PROCEDURE updateBaggae(airportUser VARCHAR2, flight VARCHAR2, size INT, weight Number, tracking_Number VARCHAR2, status VARCHAR2, special_Handling VARCHAR2)
+AS
+BEGIN
+   UPDATE BAGGAGE SET 
+			  AIRPORTUSER = airportUser, FLIGHT = flight, SIZE = size, WEIGHT = weight, 
+			  TRACKING_NUMBER = tracking_Number, STATUS = status, SPECIAL_HANDLING = special_Handling
+			  WHERE ID = id;
+END;
+/
+
+CREATE PROCEDURE getBaggageByTrackingNumber(tracking_Number VARCHAR2)
+AS
+BEGIN
+   SELECT ID, AIRPORTUSER, FLIGHT, SIZE, WEIGHT, TRACKING_NUMBER, STATUS, SPECIAL_HANDLING 
+			  FROM BAGGAGE WHERE TRACKING_NUMBER = tracking_Number;
+END;
+/
