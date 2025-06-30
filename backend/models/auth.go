@@ -34,6 +34,7 @@ type UserResponse struct {
 	Phone     string    `json:"phone,omitempty"`
 	Birthdate time.Time `json:"birthdate"`
 	Active    bool      `json:"active"`
+	Role      string    `json:"role"`
 }
 
 // ToUserResponse converts AirportUser to UserResponse (removes password)
@@ -46,5 +47,6 @@ func (u *AirportUser) ToUserResponse() UserResponse {
 		Phone:     u.Phone,
 		Birthdate: u.Birthdate,
 		Active:    u.Active,
+		Role:      u.Role,
 	}
 }

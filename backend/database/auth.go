@@ -14,7 +14,7 @@ import (
 func (db Database) GetUserByEmail(email string) (*models.AirportUser, error) {
 	var user models.AirportUser
 
-	query := `SELECT ID, FIRSTNAME, LASTNAME, BIRTHDATE, PASSWORD, ACTIVE, EMAIL, PHONE 
+	query := `SELECT ID, FIRSTNAME, LASTNAME, BIRTHDATE, PASSWORD, ACTIVE, EMAIL, PHONE, ROLE 
 			  FROM AIRPORTUSER WHERE EMAIL = :1`
 
 	err := db.QueryRow(query, email).Scan(
@@ -26,6 +26,7 @@ func (db Database) GetUserByEmail(email string) (*models.AirportUser, error) {
 		&user.Active,
 		&user.Email,
 		&user.Phone,
+		&user.Role,
 	)
 
 	if err != nil {
@@ -42,7 +43,7 @@ func (db Database) GetUserByEmail(email string) (*models.AirportUser, error) {
 func (db Database) GetUserByID(id string) (*models.AirportUser, error) {
 	var user models.AirportUser
 
-	query := `SELECT ID, FIRSTNAME, LASTNAME, BIRTHDATE, PASSWORD, ACTIVE, EMAIL, PHONE 
+	query := `SELECT ID, FIRSTNAME, LASTNAME, BIRTHDATE, PASSWORD, ACTIVE, EMAIL, PHONE, ROLE 
 			  FROM AIRPORTUSER WHERE ID = :1`
 
 	err := db.QueryRow(query, id).Scan(
@@ -54,6 +55,7 @@ func (db Database) GetUserByID(id string) (*models.AirportUser, error) {
 		&user.Active,
 		&user.Email,
 		&user.Phone,
+		&user.Role,
 	)
 
 	if err != nil {
