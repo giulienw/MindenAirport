@@ -5,7 +5,7 @@ import { authService } from '@/services/authService';
 export function useAuth() {
   const [user, setUser] = useState<User | null>(null);
   const [dashboard, setDashboard] = useState<UserDashboard | null>(null);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isInitialized, setIsInitialized] = useState(false);

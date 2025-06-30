@@ -7,7 +7,24 @@ export interface User {
   password?: string
   active: boolean
   phone?: string
+  role?: UserRole
 }
+
+export type UserRole = 'USER' | 'ADMIN' | 'STAFF' | 'MANAGER'
+
+export interface AdminUser extends User {
+  role: 'ADMIN' | 'MANAGER'
+  permissions: AdminPermission[]
+  department?: string
+}
+
+export type AdminPermission = 
+  | 'MANAGE_FLIGHTS'
+  | 'MANAGE_USERS' 
+  | 'MANAGE_BAGGAGE'
+  | 'MANAGE_TICKETS'
+  | 'VIEW_ANALYTICS'
+  | 'SYSTEM_SETTINGS'
 
 export interface LoginCredentials {
   email: string

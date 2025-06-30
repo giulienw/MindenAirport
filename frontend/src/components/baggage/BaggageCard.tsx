@@ -56,7 +56,7 @@ export function BaggageCard({ baggage }: BaggageCardProps) {
         </div>
         <span className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-sm font-medium border ${getStatusColor(baggage.status)}`}>
           {getStatusIcon(baggage.status)}
-          {baggage.status.replaceAll('_', ' ')}
+          {baggage.status.replace('_', ' ')}
         </span>
       </div>
 
