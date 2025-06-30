@@ -147,7 +147,7 @@ SELECT 1 FROM DUAL;
 
 -- Beispiel-Datensätze für die Tabelle AIRPORTUSER
 INSERT ALL
-    INTO AIRPORTUSER ("ID", FIRSTNAME, LASTNAME, BIRTHDATE, EMAIL, "PASSWORD", PHONE, ACTIVE) VALUES ('1c2c398a-9f0a-40b8-acac-c409e7388865', 'John', 'Doe', TO_DATE('15-07-85','dd-mm-yy'), 'johndoe@example.com', '$2a$10$MRvssDzwuqWxV/FkN1KOzeraYA92LqkW1.PjqC2VmenJf.U2puok.', '1234567890', 1)
+    INTO AIRPORTUSER ("ID", FIRSTNAME, LASTNAME, BIRTHDATE, EMAIL, "PASSWORD", PHONE, ACTIVE, ROLE) VALUES ('1c2c398a-9f0a-40b8-acac-c409e7388865', 'John', 'Doe', TO_DATE('15-07-85','dd-mm-yy'), 'johndoe@example.com', '$2a$10$MRvssDzwuqWxV/FkN1KOzeraYA92LqkW1.PjqC2VmenJf.U2puok.', '1234567890', 1, 'ADMIN')
     INTO AIRPORTUSER ("ID", FIRSTNAME, LASTNAME, BIRTHDATE, EMAIL, "PASSWORD", PHONE, ACTIVE) VALUES ('db6417cd-03f2-4578-bf0b-b72c20528c47', 'Jane', 'Smith', TO_DATE('25-09-90','dd-mm-yy'), 'janesmith@example.com', '$2a$10$MRvssDzwuqWxV/FkN1KOzeraYA92LqkW1.PjqC2VmenJf.U2puok.', '0987654321', 1)
     INTO AIRPORTUSER ("ID", FIRSTNAME, LASTNAME, BIRTHDATE, EMAIL, "PASSWORD", PHONE, ACTIVE) VALUES ('1f74c4b9-2d46-452b-8463-c8cce3d20abe', 'Michael', 'Brown', TO_DATE('10-03-82','dd-mm-yy'), 'michaelbrown@example.com', '$2a$10$MRvssDzwuqWxV/FkN1KOzeraYA92LqkW1.PjqC2VmenJf.U2puok.', '1122334455', 1)
     INTO AIRPORTUSER ("ID", FIRSTNAME, LASTNAME, BIRTHDATE, EMAIL, "PASSWORD", PHONE, ACTIVE) VALUES ('025a9b69-7f87-47ea-90b0-0c1fa4b23dd7', 'Emily', 'Johnson', TO_DATE('30-07-95','dd-mm-yy'), 'emilyjohnson@example.com', '$2a$10$MRvssDzwuqWxV/FkN1KOzeraYA92LqkW1.PjqC2VmenJf.U2puok.', '9988776655', 1)
