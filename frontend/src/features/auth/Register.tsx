@@ -4,7 +4,7 @@ import { useAuth } from '@/hooks'
 
 function Register() {
   const navigate = useNavigate()
-  const { register, loading: isRegistering } = useAuth()
+  const { register, isInitialized } = useAuth()
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
@@ -295,10 +295,10 @@ function Register() {
               <div className="mt-6">
                 <button
                   type="submit"
-                  disabled={isRegistering}
+                  disabled={!isInitialized}
                   className="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  {isRegistering ? (
+                  {!isInitialized ? (
                     <>
                       <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                         <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
