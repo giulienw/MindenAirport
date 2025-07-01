@@ -1,4 +1,5 @@
 import { type FlightDisplayInfo } from '@/types';
+import { getFlightStatusColor as getStatusColor } from '@/lib/utils';
 
 interface FlightCardProps {
   flight: FlightDisplayInfo;
@@ -25,23 +26,6 @@ export function FlightCard({ flight }: FlightCardProps) {
       });
     } catch {
       return 'N/A';
-    }
-  };
-
-  const getStatusColor = (status?: string) => {
-    switch (status?.toLowerCase()) {
-      case 'on time':
-      case 'departed':
-      case 'arrived':
-        return 'text-green-600 bg-green-100';
-      case 'delayed':
-        return 'text-yellow-600 bg-yellow-100';
-      case 'cancelled':
-        return 'text-red-600 bg-red-100';
-      case 'boarding':
-        return 'text-blue-600 bg-blue-100';
-      default:
-        return 'text-gray-600 bg-gray-100';
     }
   };
 

@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Plane, Clock, MapPin, Users, DollarSign, Package, AlertTriangle, CheckCircle } from 'lucide-react';
-import type { FlightManagement as FlightManagementType } from '@/types';
-import { adminService } from '@/services';
-import { getFlightType } from '@/lib/utils';
+import type { FlightDisplayInfo, FlightManagement as FlightManagementType } from '@/types';
+import { adminService, flightService } from '@/services';
+import { getFlightType, getFlightStatusColor as getStatusColor } from '@/lib/utils';
 
 export const FlightManagement: React.FC = () => {
   const [flights, setFlights] = useState<FlightManagementType[]>([]);
@@ -19,7 +19,7 @@ export const FlightManagement: React.FC = () => {
     try {
       setLoading(true);
       setError(null);
-      const result = await adminService.getFlightManagement();
+      const result = await flightService.getEnrichedFlights();
       setFlights(result);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to fetch flights');
@@ -36,23 +36,6 @@ export const FlightManagement: React.FC = () => {
       setSelectedFlight(null);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to update flight status');
-    }
-  };
-
-  const getStatusColor = (status: string) => {
-    switch (status.toLowerCase()) {
-      case 'on time':
-        return 'bg-green-100 text-green-800';
-      case 'delayed':
-        return 'bg-orange-100 text-orange-800';
-      case 'cancelled':
-        return 'bg-red-100 text-red-800';
-      case 'boarding':
-        return 'bg-blue-100 text-blue-800';
-      case 'departed':
-        return 'bg-gray-100 text-gray-800';
-      default:
-        return 'bg-gray-100 text-gray-800';
     }
   };
 

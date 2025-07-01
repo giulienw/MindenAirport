@@ -331,6 +331,80 @@ func GetAllBaggage(db database.Database) gin.HandlerFunc {
 	}
 }
 
+func GetFlightManagement(db database.Database) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		// Check admin role
+		_, authorized := checkAdminRole(c, db)
+		if !authorized {
+			return
+		}
+
+		// Get pagination parameters
+		page := 1
+		limit := 50
+
+		if p := c.Query("page"); p != "" {
+			if parsed, err := strconv.Atoi(p); err == nil && parsed > 0 {
+				page = parsed
+			}
+		}
+
+		if l := c.Query("limit"); l != "" {
+			if parsed, err := strconv.Atoi(l); err == nil && parsed > 0 && parsed <= 100 {
+				limit = parsed
+			}
+		}
+
+		// Get all flights (you'll need to implement this in database)
+		flights, total, err := db.GetAllFlights(page, limit)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to retrieve flights"})
+			return
+		}
+
+		c.JSON(http.StatusOK, gin.H{
+			"data": gin.H{
+				"flights": flights,
+				"pagination": gin.H{
+					"page":  page,
+					"limit": limit,
+					"total": total,
+				},
+			},
+			"message": "Flights retrieved successfully",
+		})
+	}
+}
+
+// UpdateFlight allows admin to update flight information
+func UpdateFlight(db database.Database) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		// Check admin role
+		_, authorized := checkAdminRole(c, db)
+		if !authorized {
+			return
+		}
+
+		flightID := c.Param("id")
+
+		var updateData models.Flight
+		if err := c.ShouldBindJSON(&updateData); err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request data", "details": err.Error()})
+			return
+		}
+
+		// Set the ID from the URL parameter
+		updateData.ID = flightID
+
+		// Update flight in database
+		db.UpdateFlight(updateData)
+
+		c.JSON(http.StatusOK, gin.H{
+			"message": "Flight updated successfully",
+		})
+	}
+}
+
 // AdminRoutes sets up admin routes
 func AdminRoutes(router *gin.RouterGroup, db database.Database) {
 	// Admin dashboard
@@ -347,4 +421,8 @@ func AdminRoutes(router *gin.RouterGroup, db database.Database) {
 
 	// Baggage management
 	router.GET("/baggage", GetAllBaggage(db))
+
+	// Flight management
+	router.GET("/flights", GetFlightManagement(db))
+	router.PATCH("/flights/:id", UpdateFlight(db))
 }
