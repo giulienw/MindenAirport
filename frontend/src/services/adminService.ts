@@ -99,7 +99,7 @@ export const adminService = {
     }
 
     try {
-      const response = await fetch(`${API_BASE_URL}/admin/flights`, {
+      const response = await fetch(`${API_BASE_URL}/flight`, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json',
@@ -112,7 +112,7 @@ export const adminService = {
       }
 
       const result = await response.json();
-      return result.data;
+      return result;
     } catch (error) {
       console.error('Failed to fetch flight management data:', error);
       throw error;

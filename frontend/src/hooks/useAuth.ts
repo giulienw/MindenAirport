@@ -33,6 +33,7 @@ export function useAuth() {
       const currentUser = authService.getCurrentUser();
       
       console.log('Auth check:', { token: !!token, currentUser: !!currentUser });
+      console.log(isInitialized)
       
       if (token && currentUser) {
         console.log('User already authenticated, setting up auth state...');
