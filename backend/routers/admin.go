@@ -60,6 +60,8 @@ func GetAdminDashboard(db database.Database) gin.HandlerFunc {
 
 		users := db.GetUserCount()
 
+		revenue, _ := db.CalculateRevenue()
+
 		// Calculate statistics
 		totalFlights := len(flights)
 		totalAirports := len(airports)
@@ -82,6 +84,7 @@ func GetAdminDashboard(db database.Database) gin.HandlerFunc {
 				"totalAirlines":   totalAirlines,
 				"activeAirlines":  activeAirlines,
 				"totalPassengers": totalPassengers,
+				"revenue":         revenue,
 			},
 			"recentFlights": flights, // You might want to limit this
 			"airports":      airports,

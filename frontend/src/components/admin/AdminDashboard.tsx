@@ -72,7 +72,7 @@ export const AdminDashboard: React.FC = () => {
     },
     {
       title: 'Revenue',
-      value: `$${(dashboard.stats.revenue / 1000000).toFixed(1)}M`,
+      value: `${dashboard.stats.revenue}€`,
       icon: DollarSign,
       color: 'emerald' as const,
       change: '+15.3%'

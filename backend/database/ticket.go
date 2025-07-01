@@ -164,3 +164,17 @@ func (db Database) GetAllTickets(page, limit int) ([]models.Ticket, int, error) 
 
 	return tickets, total, nil
 }
+
+func (db Database) CalculateRevenue() (int, error) {
+	var total int
+
+	// Get tickets with pagination and flight information
+	query := `SELECT SUM(PRICE) FROM TICKET`
+
+	err := db.QueryRow(query).Scan(&total)
+	if err != nil {
+		return 0, err
+	}
+
+	return total, nil
+}
