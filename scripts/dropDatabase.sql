@@ -67,6 +67,7 @@ drop table MAINTENANCE_LOG cascade constraints;
 drop table CREW_MEMBER cascade constraints;
 drop table FLIGHT_CREW cascade constraints;
 
+/* Drop Sequences */
 drop sequence travel_class_seq;
 drop sequence flight_status_seq;
 drop sequence plot_type_seq;
@@ -77,3 +78,22 @@ drop view GETAIRPORTS;
 drop view GETFLIGHTS;
 drop view GETFLIGHTSTATUSES;
 drop view GETMAINTENANCELOG;
+
+/* Drop Procedures */
+drop procedure GetAirlineByID;
+drop procedure GetAirlines;
+drop procedure GetAirportByID
+drop procedure GetAirports;
+drop procedure GetBaggageByFlightID;
+drop procedure GetBaggageByID;
+drop procedure GetBaggageByTrackingNumber;
+drop procedure GetBaggageByUserID;
+drop procedure GetFlightByID;
+drop procedure GetFlights;
+drop procedure GetFlightStatuses;
+drop procedure GetFlightStatusesByID;
+drop procedure GetMaintenanceLog;
+drop procedure GetMaintenanceLogByID;
+drop procedure GetTicketByUserID;
+drop procedure GetUserByEmail;
+drop procedure GetUserById;
