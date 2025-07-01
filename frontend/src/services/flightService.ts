@@ -71,7 +71,7 @@ export const flightService = {
         ...flight,
         fromAirport: airportMap.get(flight.from),
         toAirport: airportMap.get(flight.to),
-        statusInfo: statusMap.get(flight.statusId || ''),
+        statusInfo: statusMap.get(flight.statusId || -1),
         airline: airlineMap.get(flight.airlineId),
       }));
     } catch (error) {

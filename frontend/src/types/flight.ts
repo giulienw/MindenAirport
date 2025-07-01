@@ -17,7 +17,7 @@ export interface Flight {
 }
 
 export interface FlightStatus {
-  id: string;
+  id: number;
   name: string;
   description?: string;
 }

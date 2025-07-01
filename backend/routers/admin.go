@@ -86,9 +86,8 @@ func GetAdminDashboard(db database.Database) gin.HandlerFunc {
 				"totalPassengers": totalPassengers,
 				"revenue":         revenue,
 			},
-			"recentFlights": flights, // You might want to limit this
-			"airports":      airports,
-			"airlines":      airlines,
+			"airlines": airlines,
+			"airports": airports,
 		}
 
 		c.JSON(http.StatusOK, gin.H{

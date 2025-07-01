@@ -58,7 +58,7 @@ export const AdminDashboard: React.FC = () => {
     },
     {
       title: 'Active Flights',
-      value: dashboard.recentFlights.filter(flight => flight.statusId != 6).length,
+      value: dashboard.flights.filter(flight => flight.statusId != 6).length,
       icon: Activity,
       color: 'green' as const,
       change: '+12%'
@@ -79,7 +79,7 @@ export const AdminDashboard: React.FC = () => {
     },
     {
       title: 'Delayed Flights',
-      value: dashboard.recentFlights.filter(flight => flight.statusId == 5).length,
+      value: dashboard.flights.filter(flight => flight.statusId == 5).length,
       icon: Clock,
       color: 'orange' as const,
       change: '-2.1%'

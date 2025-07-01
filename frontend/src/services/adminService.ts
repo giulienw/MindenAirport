@@ -4,6 +4,7 @@ import type {
   FlightManagement, 
   BaggageManagement} from '@/types';
 import { API_BASE_URL } from '@/config';
+import { flightService } from './flightService';
 
 export const adminService = {
   async getAdminDashboard(): Promise<AdminDashboard> {
@@ -25,8 +26,15 @@ export const adminService = {
         throw new Error(errorData.error || 'Failed to fetch admin dashboard');
       }
 
-      const result = await response.json();
-      return result.data;
+      const [ dashboardResponse, flightsResponse ] = await Promise.all([
+        response.json(), flightService.getEnrichedFlights()
+      ]);
+      return {
+        stats: dashboardResponse.data.stats,
+        airlines: dashboardResponse.data.airlines,
+        airports: dashboardResponse.data.airports,
+        flights: flightsResponse,
+      } as AdminDashboard;
     } catch (error) {
       console.error('Failed to fetch admin dashboard:', error);
       throw error;

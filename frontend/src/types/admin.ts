@@ -60,5 +60,5 @@ export interface AdminDashboard {
   stats: AdminDashboardStats;
   airlines: Airline[];
   airports: Airport[];
-  recentFlights: Flight[];
+  flights: FlightDisplayInfo[];
 }
