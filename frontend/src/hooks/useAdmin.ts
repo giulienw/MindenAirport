@@ -19,14 +19,8 @@ export const useAdmin = (): UseAdminReturn => {
       setLoading(true);
       setError(null);
       
-      // In development, use mock data
-      if (process.env.NODE_ENV === 'development') {
-        const mockData = adminService.getMockAdminDashboard();
-        setDashboard(mockData);
-      } else {
-        const data = await adminService.getAdminDashboard();
-        setDashboard(data);
-      }
+      const data = await adminService.getAdminDashboard();
+      setDashboard(data);
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Failed to fetch admin dashboard';
       setError(errorMessage);

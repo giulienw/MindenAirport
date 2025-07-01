@@ -1,13 +1,12 @@
 import React, { useState } from 'react';
 import { Clock, Users, Plane, Package, AlertTriangle, DollarSign, Activity, TrendingUp } from 'lucide-react';
 import { AdminStatsCard } from './AdminStatsCard';
-import { AdminAlerts } from './AdminAlerts';
 import { UserManagement } from './UserManagement';
 import { FlightManagement } from './FlightManagement';
-import { AdminActivity } from './AdminActivity';
 import { useAdmin } from '@/hooks/useAdmin';
+import { authService } from '@/services';
 
-type TabType = 'overview' | 'users' | 'flights' | 'baggage' | 'alerts';
+type TabType = 'overview' | 'users' | 'flights' | 'baggage';
 
 export const AdminDashboard: React.FC = () => {
   const [activeTab, setActiveTab] = useState<TabType>('overview');
@@ -46,8 +45,7 @@ export const AdminDashboard: React.FC = () => {
     { id: 'overview' as const, label: 'Overview', icon: TrendingUp },
     { id: 'users' as const, label: 'Users', icon: Users },
     { id: 'flights' as const, label: 'Flights', icon: Plane },
-    { id: 'baggage' as const, label: 'Baggage', icon: Package },
-    { id: 'alerts' as const, label: 'Alerts', icon: AlertTriangle },
+    { id: 'baggage' as const, label: 'Baggage', icon: Package }
   ];
 
   const statsConfig = [
@@ -103,7 +101,7 @@ export const AdminDashboard: React.FC = () => {
           <div className="flex justify-between items-center py-6">
             <div>
               <h1 className="text-3xl font-bold text-gray-900">Admin Dashboard</h1>
-              <p className="text-gray-600">Welcome back, {dashboard.admin.firstName}</p>
+              <p className="text-gray-600">Welcome back, {authService.getCurrentUser()?.firstName}</p>
             </div>
             <div className="flex items-center space-x-3">
               <button
@@ -139,11 +137,6 @@ export const AdminDashboard: React.FC = () => {
                 >
                   <Icon className="w-5 h-5" />
                   <span>{tab.label}</span>
-                  {tab.id === 'alerts' && dashboard.alerts.filter(a => !a.resolved).length > 0 && (
-                    <span className="bg-red-100 text-red-800 text-xs font-medium px-2 py-1 rounded-full">
-                      {dashboard.alerts.filter(a => !a.resolved).length}
-                    </span>
-                  )}
                 </button>
               );
             })}
@@ -168,15 +161,6 @@ export const AdminDashboard: React.FC = () => {
                 />
               ))}
             </div>
-
-            {/* Recent Activity and Alerts */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-              <AdminActivity activities={dashboard.recentActivity} />
-              <AdminAlerts 
-                alerts={dashboard.alerts.slice(0, 5)} 
-                onResolveAlert={() => refreshDashboard()} 
-              />
-            </div>
           </div>
         )}
 
@@ -187,13 +171,6 @@ export const AdminDashboard: React.FC = () => {
             <h2 className="text-xl font-semibold text-gray-900 mb-4">Baggage Management</h2>
             <p className="text-gray-600">Baggage management interface coming soon...</p>
           </div>
-        )}
-        {activeTab === 'alerts' && (
-          <AdminAlerts 
-            alerts={dashboard.alerts} 
-            onResolveAlert={() => refreshDashboard()}
-            showAll 
-          />
         )}
       </div>
     </div>

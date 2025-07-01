@@ -80,8 +80,8 @@ func (db Database) CreateUser(req models.RegisterRequest) (*models.AirportUser, 
 	userID := uuid.New().String()
 
 	// Insert user into database
-	query := `INSERT INTO AIRPORTUSER (ID, FIRSTNAME, LASTNAME, BIRTHDATE, PASSWORD, ACTIVE, EMAIL, PHONE) 
-			  VALUES (:1, :2, :3, :4, :5, :6, :7, :8)`
+	query := `INSERT INTO AIRPORTUSER (ID, FIRSTNAME, LASTNAME, BIRTHDATE, PASSWORD, ACTIVE, EMAIL, PHONE, ROLE) 
+			  VALUES (:1, :2, :3, :4, :5, :6, :7, :8, :9)`
 
 	_, err = db.Exec(query,
 		userID,
@@ -92,6 +92,7 @@ func (db Database) CreateUser(req models.RegisterRequest) (*models.AirportUser, 
 		1, // Active by default
 		req.Email,
 		req.Phone,
+		"USER", // Default role
 	)
 
 	if err != nil {
@@ -109,6 +110,7 @@ func (db Database) CreateUser(req models.RegisterRequest) (*models.AirportUser, 
 		Active:    true,
 		Email:     req.Email,
 		Phone:     req.Phone,
+		Role:      "USER",
 	}
 
 	return user, nil
@@ -134,4 +136,79 @@ func (db Database) CheckEmailExists(email string) (bool, error) {
 	query := `SELECT COUNT(*) FROM AIRPORTUSER WHERE EMAIL = :1`
 	err := db.QueryRow(query, email).Scan(&count)
 	return count > 0, err
+}
+
+// GetAllUsers retrieves all users with pagination for admin
+func (db Database) GetAllUsers(page, limit int) ([]models.AirportUser, int, error) {
+	var users []models.AirportUser
+	var total int
+
+	// First get the total count
+	countQuery := `SELECT COUNT(*) FROM AIRPORTUSER`
+	err := db.QueryRow(countQuery).Scan(&total)
+	if err != nil {
+		return nil, 0, err
+	}
+
+	// Calculate offset
+	offset := (page - 1) * limit
+
+	// Get users with pagination
+	query := `SELECT ID, FIRSTNAME, LASTNAME, BIRTHDATE, PASSWORD, ACTIVE, EMAIL, PHONE, ROLE 
+			  FROM AIRPORTUSER 
+			  ORDER BY ID 
+			  OFFSET :1 ROWS FETCH NEXT :2 ROWS ONLY`
+
+	rows, err := db.Query(query, offset, limit)
+	if err != nil {
+		return nil, 0, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var user models.AirportUser
+		err := rows.Scan(
+			&user.ID,
+			&user.FirstName,
+			&user.LastName,
+			&user.Birthdate,
+			&user.Password,
+			&user.Active,
+			&user.Email,
+			&user.Phone,
+			&user.Role,
+		)
+		if err != nil {
+			return nil, 0, err
+		}
+		users = append(users, user)
+	}
+
+	if err = rows.Err(); err != nil {
+		return nil, 0, err
+	}
+
+	return users, total, nil
+}
+
+// UpdateUserByAdmin updates user information by admin
+func (db Database) UpdateUserByAdmin(userID, firstName, lastName, email, phone string, active *bool, role string) error {
+	query := `UPDATE AIRPORTUSER SET 
+			  FIRSTNAME = :1, LASTNAME = :2, EMAIL = :3, PHONE = :4, ACTIVE = :5, ROLE = :6
+			  WHERE ID = :7`
+
+	activeValue := 1
+	if active != nil && !*active {
+		activeValue = 0
+	}
+
+	_, err := db.Exec(query, firstName, lastName, email, phone, activeValue, role, userID)
+	return err
+}
+
+func (db Database) GetUserCount() int {
+	var count int
+	query := `SELECT COUNT(*) FROM AIRPORTUSER`
+	db.QueryRow(query).Scan(&count)
+	return count
 }
