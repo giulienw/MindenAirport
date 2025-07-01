@@ -1,16 +1,13 @@
-import type { AdminUser, UserRole } from './auth';
-import type { FlightDisplayInfo } from './flight';
+import type { UserRole } from './auth';
+import type { Airline, Airport, Flight, FlightDisplayInfo } from './flight';
 import type { BaggageItem } from './baggage';
 
 export interface AdminDashboardStats {
   totalFlights: number;
-  activeFlights: number;
   totalPassengers: number;
   totalBaggage: number;
-  delayedFlights: number;
-  lostBaggage: number;
+  activeAirlines: number;
   revenue: number;
-  capacity: number;
 }
 
 export interface SystemAlert {
@@ -60,10 +57,8 @@ export interface AdminActivity {
 }
 
 export interface AdminDashboard {
-  admin: AdminUser;
   stats: AdminDashboardStats;
-  alerts: SystemAlert[];
-  recentActivity: AdminActivity[];
-  criticalFlights: FlightManagement[];
-  problematicBaggage: BaggageManagement[];
+  airlines: Airline[];
+  airports: Airport[];
+  recentFlights: Flight[];
 }

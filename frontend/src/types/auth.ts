@@ -12,11 +12,6 @@ export interface User {
 
 export type UserRole = 'USER' | 'ADMIN' | 'STAFF' | 'MANAGER'
 
-export interface AdminUser extends User {
-  role: 'ADMIN' | 'MANAGER'
-  permissions: AdminPermission[]
-  department?: string
-}
 
 export type AdminPermission = 
   | 'MANAGE_FLIGHTS'
