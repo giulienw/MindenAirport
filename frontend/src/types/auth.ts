@@ -7,7 +7,21 @@ export interface User {
   password?: string
   active: boolean
   phone?: string
+  role?: UserRole
+  ticketCount?: number
+  lastLogin?: string
 }
+
+export type UserRole = 'USER' | 'ADMIN' | 'STAFF' | 'MANAGER'
+
+
+export type AdminPermission = 
+  | 'MANAGE_FLIGHTS'
+  | 'MANAGE_USERS' 
+  | 'MANAGE_BAGGAGE'
+  | 'MANAGE_TICKETS'
+  | 'VIEW_ANALYTICS'
+  | 'SYSTEM_SETTINGS'
 
 export interface LoginCredentials {
   email: string

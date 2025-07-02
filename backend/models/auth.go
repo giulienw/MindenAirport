@@ -27,13 +27,15 @@ type AuthResponse struct {
 
 // UserResponse represents a sanitized user response (without password)
 type UserResponse struct {
-	ID        string    `json:"id"`
-	FirstName string    `json:"firstName"`
-	LastName  string    `json:"lastName"`
-	Email     string    `json:"email"`
-	Phone     string    `json:"phone,omitempty"`
-	Birthdate time.Time `json:"birthdate"`
-	Active    bool      `json:"active"`
+	ID          string    `json:"id"`
+	FirstName   string    `json:"firstName"`
+	LastName    string    `json:"lastName"`
+	Email       string    `json:"email"`
+	Phone       string    `json:"phone,omitempty"`
+	Birthdate   time.Time `json:"birthdate"`
+	Active      bool      `json:"active"`
+	Role        string    `json:"role"`
+	TicketCount int       `json:"ticketCount,omitempty"` // Optional field for user ticket count
 }
 
 // ToUserResponse converts AirportUser to UserResponse (removes password)
@@ -46,5 +48,6 @@ func (u *AirportUser) ToUserResponse() UserResponse {
 		Phone:     u.Phone,
 		Birthdate: u.Birthdate,
 		Active:    u.Active,
+		Role:      u.Role,
 	}
 }

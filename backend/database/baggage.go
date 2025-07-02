@@ -229,3 +229,55 @@ func (db Database) GetBaggageByTrackingNumber(trackingNumber string) (*models.Ba
 
 	return &baggage, nil
 }
+
+// GetAllBaggage retrieves all baggage with pagination for admin
+func (db Database) GetAllBaggage(page, limit int) ([]models.Baggage, int, error) {
+	var baggageList []models.Baggage
+	var total int
+
+	// First get the total count
+	countQuery := `SELECT COUNT(*) FROM BAGGAGE`
+	err := db.QueryRow(countQuery).Scan(&total)
+	if err != nil {
+		return nil, 0, err
+	}
+
+	// Calculate offset
+	offset := (page - 1) * limit
+
+	// Get baggage with pagination
+	query := `SELECT ID, AIRPORTUSER, FLIGHT, SIZE, WEIGHT, TRACKING_NUMBER, STATUS, SPECIAL_HANDLING 
+			  FROM BAGGAGE 
+			  ORDER BY ID DESC
+			  OFFSET :1 ROWS FETCH NEXT :2 ROWS ONLY`
+
+	rows, err := db.Query(query, offset, limit)
+	if err != nil {
+		return nil, 0, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var baggage models.Baggage
+		err := rows.Scan(
+			&baggage.ID,
+			&baggage.AirportUserID,
+			&baggage.FlightID,
+			&baggage.Size,
+			&baggage.Weight,
+			&baggage.TrackingNumber,
+			&baggage.Status,
+			&baggage.SpecialHandling,
+		)
+		if err != nil {
+			return nil, 0, err
+		}
+		baggageList = append(baggageList, baggage)
+	}
+
+	if err = rows.Err(); err != nil {
+		return nil, 0, err
+	}
+
+	return baggageList, total, nil
+}
