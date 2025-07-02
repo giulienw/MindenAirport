@@ -85,7 +85,7 @@ export const flightService = {
     try {
       const response = await fetch(`${API_BASE_URL}/flight/${flightId}`);
       if (!response.ok) {
-        throw new Error('Failed to fetch airlines');
+        throw new Error('Failed to fetch flight by ID');
       }
       return response.json();
     } catch (error) {
