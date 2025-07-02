@@ -95,10 +95,6 @@ BEGIN
 END;
 /
 
-/*==============================================================*/
-/* Missing Stored Procedures for Flight Operations             */
-/*==============================================================*/
-
 -- Create flight procedure
 CREATE OR REPLACE PROCEDURE CreateFlight(
     id VARCHAR2,
@@ -206,10 +202,6 @@ BEGIN
     DELETE FROM FLIGHT WHERE ID = p_id;
 END;
 /
-
-/*==============================================================*/
-/* Missing Stored Procedures for Ticket Operations             */
-/*==============================================================*/
 
 -- Get all tickets with pagination and details
 CREATE OR REPLACE PROCEDURE GetAllTickets(
@@ -330,10 +322,6 @@ BEGIN
     ORDER BY TICKET.BOOKING_DATE DESC;
 END;
 /
-
-/*==============================================================*/
-/* Updated Stored Procedures for Baggage Operations            */
-/*==============================================================*/
 
 -- Delete baggage procedure
 CREATE OR REPLACE PROCEDURE DeleteBaggage(
@@ -472,10 +460,6 @@ BEGIN
 END;
 /
 
-/*==============================================================*/
-/* Missing Stored Procedures for Airport and Airline Operations */
-/*==============================================================*/
-
 -- Get all airports procedure
 CREATE OR REPLACE PROCEDURE GetAllAirports(
     result_cursor OUT SYS_REFCURSOR
@@ -530,10 +514,6 @@ BEGIN
 END;
 /
 
-/*==============================================================*/
-/* Missing Stored Procedures for Maintenance Log Operations    */
-/*==============================================================*/
-
 -- Get all maintenance logs
 CREATE OR REPLACE PROCEDURE GetMaintenanceLogs(
     result_cursor OUT SYS_REFCURSOR
@@ -558,10 +538,6 @@ BEGIN
 END;
 /
 
-/*==============================================================*/
-/* Missing Stored Procedures for Flight Status Operations      */
-/*==============================================================*/
-
 -- Get all flight statuses procedure
 CREATE OR REPLACE PROCEDURE GetFlightStatuses(
     result_cursor OUT SYS_REFCURSOR
@@ -585,10 +561,6 @@ BEGIN
     WHERE ID = p_id;
 END;
 /
-
-/*==============================================================*/
-/* Fixed Stored Procedures (Update existing ones)              */
-/*==============================================================*/
 
 -- Fix UpdateFlight procedure to match new schema
 CREATE OR REPLACE PROCEDURE UpdateFlightFixed (
