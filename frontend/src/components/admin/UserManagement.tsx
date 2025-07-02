@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Search, User, Mail, Calendar, MoreVertical, Check, X, Shield, Users } from 'lucide-react';
-import type { UserManagement as UserManagementType } from '@/types';
+import type { User as UserManagementType } from '@/types';
 import { adminService } from '@/services';
 
 export const UserManagement: React.FC = () => {
@@ -159,6 +159,7 @@ export const UserManagement: React.FC = () => {
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
               {users.map((user) => (
+                console.log(user),
                 <tr key={user.id} className="hover:bg-gray-50">
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="flex items-center">
@@ -207,11 +208,11 @@ export const UserManagement: React.FC = () => {
                     {formatLastLogin(user.lastLogin)}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    {user.ticketCount}
+                    {user.ticketCount || 0}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 flex items-center">
                     <Calendar className="w-4 h-4 mr-1" />
-                    {formatDate(user.createdAt)}
+                    {formatDate(user.birthDate || "")}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                     <div className="relative">

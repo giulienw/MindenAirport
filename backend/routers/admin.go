@@ -132,7 +132,10 @@ func GetAllUsers(db database.Database) gin.HandlerFunc {
 		// Convert to safe user responses
 		var userResponses []models.UserResponse
 		for _, user := range users {
-			userResponses = append(userResponses, user.ToUserResponse())
+			tickets, _ := db.GetTicketsByUserID(user.ID)
+			userResponse := user.ToUserResponse()
+			userResponse.TicketCount = len(tickets)
+			userResponses = append(userResponses, userResponse)
 		}
 
 		c.JSON(http.StatusOK, gin.H{

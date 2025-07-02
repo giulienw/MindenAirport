@@ -1,8 +1,8 @@
 import type {
   AdminDashboard,
-  UserManagement,
   FlightManagement,
   BaggageManagement,
+  User,
 } from "@/types";
 import { API_BASE_URL } from "@/config";
 import { flightService } from "./flightService";
@@ -47,7 +47,7 @@ export const adminService = {
     page = 1,
     limit = 20,
     search?: string
-  ): Promise<{ users: UserManagement[]; total: number }> {
+  ): Promise<{ users: User[]; total: number }> {
     const token = localStorage.getItem("token");
     if (!token) {
       throw new Error("No authentication token found");
@@ -87,18 +87,15 @@ export const adminService = {
     }
 
     try {
-        const activeInt = active ? 1 : 0;
-      const response = await fetch(
-        `${API_BASE_URL}/admin/users/${userId}`,
-        {
-          method: "DELETE",
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ active: activeInt}),
-        }
-      );
+      const activeInt = active ? 1 : 0;
+      const response = await fetch(`${API_BASE_URL}/admin/users/${userId}`, {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ active: activeInt }),
+      });
 
       if (!response.ok) {
         const errorData = await response.json();

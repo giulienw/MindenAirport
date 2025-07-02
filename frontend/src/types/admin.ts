@@ -1,5 +1,4 @@
-import type { UserRole } from './auth';
-import type { Airline, Airport, Flight, FlightDisplayInfo } from './flight';
+import type { Airline, Airport, FlightDisplayInfo } from './flight';
 import type { BaggageItem } from './baggage';
 
 export interface AdminDashboardStats {
@@ -17,18 +16,6 @@ export interface SystemAlert {
   timestamp: string;
   resolved: boolean;
   category: 'FLIGHT' | 'BAGGAGE' | 'SYSTEM' | 'SECURITY';
-}
-
-export interface UserManagement {
-  id: string;
-  email: string;
-  firstName: string;
-  lastName: string;
-  role: UserRole;
-  active: boolean;
-  lastLogin?: string;
-  createdAt: string;
-  ticketCount: number;
 }
 
 export interface FlightManagement extends FlightDisplayInfo {

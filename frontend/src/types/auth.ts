@@ -8,6 +8,8 @@ export interface User {
   active: boolean
   phone?: string
   role?: UserRole
+  ticketCount?: number
+  lastLogin?: string
 }
 
 export type UserRole = 'USER' | 'ADMIN' | 'STAFF' | 'MANAGER'
