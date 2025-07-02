@@ -67,7 +67,6 @@ export const flightService = {
       const statusMap = new Map(flightStatuses.map(status => [status.id, status]));
       const airlineMap = new Map(airlines.map(airline => [airline.id, airline]));
 
-      console.log(airlineMap)
 
       return flights.map(flight => ({
         ...flight,
