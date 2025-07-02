@@ -7,6 +7,7 @@ import { Plane, Clock, MapPin, Users } from "lucide-react";
 function Home() {
   const { flights, loading, error, refetch } = useFlights();
   const [currentTime, setCurrentTime] = useState(new Date());
+  const isAdmin = localStorage.getItem('user') ? JSON.parse(localStorage.getItem('user')!).role === 'ADMIN' : false;
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -58,6 +59,14 @@ function Home() {
                   })}
                 </div>
               </div>
+              {isAdmin ? (
+                <Link 
+                to="/admin" 
+                className="bg-white text-red-600 hover:bg-red-50 px-4 py-2 rounded-md text-sm font-medium transition-colors"
+              >
+                Admin
+              </Link>
+              ) : null}
               <Link 
                 to="/login" 
                 className="bg-white text-blue-600 hover:bg-blue-50 px-4 py-2 rounded-md text-sm font-medium transition-colors"

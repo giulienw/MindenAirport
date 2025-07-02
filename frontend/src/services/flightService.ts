@@ -67,15 +67,29 @@ export const flightService = {
       const statusMap = new Map(flightStatuses.map(status => [status.id, status]));
       const airlineMap = new Map(airlines.map(airline => [airline.id, airline]));
 
+
       return flights.map(flight => ({
         ...flight,
         fromAirport: airportMap.get(flight.from),
         toAirport: airportMap.get(flight.to),
-        statusInfo: statusMap.get(flight.statusId || ''),
+        statusInfo: statusMap.get(flight.statusId || -1),
         airline: airlineMap.get(flight.airlineId),
       }));
     } catch (error) {
       console.error('Failed to fetch enriched flight data:', error);
+      throw error;
+    }
+  },
+
+  async getFlightById(flightId: string): Promise<FlightDisplayInfo | null> {
+    try {
+      const response = await fetch(`${API_BASE_URL}/flight/${flightId}`);
+      if (!response.ok) {
+        throw new Error('Failed to fetch flight by ID');
+      }
+      return response.json();
+    } catch (error) {
+      console.error('Failed to fetch flight by ID:', error);
       throw error;
     }
   },

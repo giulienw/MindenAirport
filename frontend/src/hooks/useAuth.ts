@@ -5,7 +5,7 @@ import { authService } from '@/services/authService';
 export function useAuth() {
   const [user, setUser] = useState<User | null>(null);
   const [dashboard, setDashboard] = useState<UserDashboard | null>(null);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isInitialized, setIsInitialized] = useState(false);
@@ -33,6 +33,7 @@ export function useAuth() {
       const currentUser = authService.getCurrentUser();
       
       console.log('Auth check:', { token: !!token, currentUser: !!currentUser });
+      console.log(isInitialized)
       
       if (token && currentUser) {
         console.log('User already authenticated, setting up auth state...');
@@ -68,7 +69,7 @@ export function useAuth() {
       const authResponse = await authService.login(credentials);
       
       // Store auth data
-      localStorage.setItem('token', authResponse.token);
+      //localStorage.setItem('token', authResponse.token);
       localStorage.setItem('user', JSON.stringify(authResponse.user));
       
       setUser(authResponse.user);
@@ -102,7 +103,7 @@ export function useAuth() {
       const authResponse = await authService.register(data);
       
       // Store auth data
-      localStorage.setItem('token', authResponse.token);
+      //localStorage.setItem('token', authResponse.token);
       localStorage.setItem('user', JSON.stringify(authResponse.user));
       
       setUser(authResponse.user);

@@ -38,6 +38,7 @@ export const authService = {
           phone: result.data.user.phone,
           birthDate: result.data.user.birthdate,
           active: result.data.user.active,
+          role: result.data.user.role,
         },
         token: result.data.token,
       };

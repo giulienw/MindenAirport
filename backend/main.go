@@ -56,6 +56,11 @@ func main() {
 	routers.TicketRoutes(protected.Group("/ticket"), db)
 	routers.BaggageRoutes(protected.Group("/baggage"), db)
 
+	// Admin routes (require authentication and admin role)
+	adminProtected := apiRouter.Group("/admin")
+	adminProtected.Use(middleware.AuthMiddleware())
+	routers.AdminRoutes(adminProtected, db)
+
 	// Protected auth routes
 	authProtected := apiRouter.Group("/auth")
 	authProtected.Use(middleware.AuthMiddleware())
