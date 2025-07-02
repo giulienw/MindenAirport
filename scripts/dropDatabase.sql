@@ -81,19 +81,23 @@ drop view GETMAINTENANCELOG;
 
 /* Drop Procedures */
 drop procedure GetAirlineByID;
-drop procedure GetAirlines;
-drop procedure GetAirportByID
-drop procedure GetAirports;
-drop procedure GetBaggageByFlightID;
-drop procedure GetBaggageByID;
-drop procedure GetBaggageByTrackingNumber;
-drop procedure GetBaggageByUserID;
-drop procedure GetFlightByID;
-drop procedure GetFlights;
-drop procedure GetFlightStatuses;
-drop procedure GetFlightStatusesByID;
-drop procedure GetMaintenanceLog;
-drop procedure GetMaintenanceLogByID;
-drop procedure GetTicketByUserID;
+drop procedure GetAirportByID;
 drop procedure GetUserByEmail;
 drop procedure GetUserById;
+drop procedure CreateUser;
+drop procedure UpdateLastLogin;
+drop procedure DeactivateUser;
+drop procedure CheckEmailExists;
+drop procedure GetBaggageByID;
+drop procedure GetBaggageByUserID;
+drop procedure GetBaggageByFlightID;
+drop procedure CreateBaggage;
+drop procedure UpdateBaggage;
+drop procedure GetBaggageByTrackingNumber;
+drop procedure GetFlightByID;
+drop procedure UpdateFlight;
+drop procedure DeleteFlight;
+drop procedure GetFlightStatusesByID;
+drop procedure GetMaintenanceLogByID;
+drop procedure GetTicketByID
+drop procedure GetTicketByUserID

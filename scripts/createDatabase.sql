@@ -441,14 +441,14 @@ CREATE PROCEDURE GetAirlineByID (
 )
 AS
 BEGIN
-   SELECT * FROM airline WHERE id = ID;
+   SELECT * FROM airline WHERE id = GetAirlineByID.ID;
 END;
 /
 
 CREATE PROCEDURE GetAirportByID (id VARCHAR2)
 AS
 BEGIN
-   SELECT * FROM AIRPORT WHERE ID = id;
+   SELECT * FROM AIRPORT WHERE ID = GetAirportByID.id;
 END;
 /
 
@@ -456,7 +456,7 @@ CREATE PROCEDURE GetUserByEmail (email VARCHAR2)
 AS   
 BEGIN
    SELECT ID, FIRSTNAME, LASTNAME, BIRTHDATE, PASSWORD, ACTIVE, EMAIL, PHONE 
-			  FROM AIRPORTUSER WHERE EMAIL = email;
+			  FROM AIRPORTUSER WHERE EMAIL = GetUserByEmail.email;
 END;
 /
 
@@ -464,7 +464,7 @@ CREATE PROCEDURE GetUserById (id VARCHAR2)
 AS
 BEGIN 
    SELECT ID, FIRSTNAME, LASTNAME, BIRTHDATE, PASSWORD, ACTIVE, EMAIL, PHONE 
-			  FROM AIRPORTUSER WHERE ID = id;
+			  FROM AIRPORTUSER WHERE ID = GetUserById.id;
 END;
 /
 
@@ -472,7 +472,7 @@ CREATE PROCEDURE CreateUser(id VARCHAR2, firstName VARCHAR2, lastName VARCHAR2, 
 AS
 BEGIN
    INSERT INTO AIRPORTUSER (ID, FIRSTNAME, LASTNAME, BIRTHDATE, PASSWORD, ACTIVE, EMAIL, PHONE) 
-			  VALUES (id, firstName, lastName, birthdate, password, active, email, phone);
+			  VALUES (CreateUser.id, CreateUser.firstName, CreateUser.lastName, CreateUser.birthdate, CreateUser.password, CreateUser.active, CreateUser.email, CreateUser.phone);
 END;
 /
 
@@ -480,21 +480,21 @@ END;
 CREATE PROCEDURE UpdateLastLogin(last_login VARCHAR2 , id VARCHAR2)
 AS
 BEGIN
-   UPDATE AIRPORTUSER SET LAST_LOGIN = last_login WHERE ID = id;
+   UPDATE AIRPORTUSER SET LAST_LOGIN = UpdateLastLogin.last_login WHERE ID = UpdateLastLogin.id;
 END;
 /
 
 CREATE PROCEDURE DeactivateUser(id VARCHAR2)
 AS 
 BEGIN
-   UPDATE AIRPORTUSER SET ACTIVE = 0 WHERE ID = id;
+   UPDATE AIRPORTUSER SET ACTIVE = 0 WHERE ID = DeactivateUser.id;
 END;
 /
 
 CREATE PROCEDURE CheckEmailExists(email VARCHAR2)
 AS
 BEGIN
-   SELECT COUNT(*) FROM AIRPORTUSER WHERE EMAIL = email;
+   SELECT COUNT(*) FROM AIRPORTUSER WHERE EMAIL = CheckEmailExists.email;
 END;
 /
 
@@ -502,14 +502,14 @@ CREATE PROCEDURE GetBaggageByID(id VARCHAR2)
 AS
 BEGIN
    SELECT ID, AIRPORTUSER, FLIGHT, SIZE, WEIGHT, TRACKING_NUMBER, STATUS, SPECIAL_HANDLING 
-			  FROM BAGGAGE WHERE ID = id;
+			  FROM BAGGAGE WHERE ID = GetBaggageByID.id;
 END;
 /
 
 CREATE PROCEDURE GetBaggageByUserID(userID VARCHAR2)
 AS
 BEGIN
-   SELECT * FROM BAGGAGE WHERE AIRPORTUSER = userID ORDER BY ID DESC;
+   SELECT * FROM BAGGAGE WHERE AIRPORTUSER = GetBaggageByUserID.userID ORDER BY ID DESC;
 END;
 /
 
@@ -519,7 +519,7 @@ CREATE PROCEDURE GetBaggageByFlightID(
 AS
 BEGIN
    SELECT ID, AIRPORTUSER, FLIGHT, SIZE, WEIGHT, TRACKING_NUMBER, STATUS, SPECIAL_HANDLING 
-			  FROM BAGGAGE WHERE FLIGHT = flightID ORDER BY ID DESC;
+			  FROM BAGGAGE WHERE FLIGHT = GetBaggageByFlightID.flightID ORDER BY ID DESC;
 END;
 /
 
@@ -536,11 +536,12 @@ CREATE PROCEDURE CreateBaggage(
 AS
 BEGIN
    INSERT INTO BAGGAGE (ID, AIRPORTUSER, FLIGHT, SIZE, WEIGHT, TRACKING_NUMBER, STATUS, SPECIAL_HANDLING)
-			  VALUES (id, airportUser, flight, size, weight, tracking_Number, status, special_Handling);
+			  VALUES (CreateBaggage.id, CreateBaggage.airportUser, CreateBaggage.flight, CreateBaggage.size, CreateBaggage.weight, CreateBaggage.tracking_Number, CreateBaggage.status, CreateBaggage.special_Handling);
 END;
 /
 
 CREATE PROCEDURE UpdateBaggage(
+   id VARCHAR2,
    airportUser VARCHAR2,
    flight VARCHAR2,
    size INT,
@@ -552,14 +553,14 @@ CREATE PROCEDURE UpdateBaggage(
 AS
 BEGIN
    UPDATE BAGGAGE SET 
-		AIRPORTUSER = airportUser,
-      FLIGHT = flight,
-      SIZE = size,
-      WEIGHT = weight,
-		TRACKING_NUMBER = tracking_Number,
-      STATUS = status,
-      SPECIAL_HANDLING = special_Handling
-	WHERE ID = id;
+		AIRPORTUSER = UpdateBaggage.airportUser,
+      FLIGHT = UpdateBaggage.flight,
+      SIZE = UpdateBaggage.size,
+      WEIGHT = UpdateBaggage.weight,
+		TRACKING_NUMBER = UpdateBaggage.tracking_Number,
+      STATUS = UpdateBaggage.status,
+      SPECIAL_HANDLING = UpdateBaggage.special_Handling
+	WHERE ID = UpdateBaggage.id;
 END;
 /
 
@@ -569,7 +570,7 @@ CREATE PROCEDURE GetBaggageByTrackingNumber(
 AS
 BEGIN
    SELECT ID, AIRPORTUSER, FLIGHT, SIZE, WEIGHT, TRACKING_NUMBER, STATUS, SPECIAL_HANDLING 
-		FROM BAGGAGE WHERE TRACKING_NUMBER = tracking_Number;
+		FROM BAGGAGE WHERE TRACKING_NUMBER = GetBaggageByTrackingNumber.tracking_Number;
 END;
 /
 
@@ -578,7 +579,7 @@ CREATE PROCEDURE GetFlightByID (
 )
 AS
 BEGIN
-   SELECT * FROM flight WHERE id = ID;
+   SELECT * FROM flight WHERE id = GetFlightByID.ID;
 END;
 /
 
@@ -601,20 +602,19 @@ CREATE PROCEDURE UpdateFlight (
 AS
 BEGIN
    UPDATE flight SET
-      "from" = "from",
-      "to" = "to",
-      "date" = "date",
-      pilot_id = pilot_id,
-      plane_id = planeID,
-      terminal_id = terminalID,
-      status_id = statusID,
-      scheduled_departure = scheduledDeparture,
-      actual_departure = actualDeparture,
-      scheduled_arrival = scheduledArrival,
-      actual_arrival = actualArrival,
-      gate = gate,
-      baggage_claim = baggageClaim
-   WHERE id = ID;
+      "FROM" = UpdateFlight."from",
+      "TO" = UpdateFlight."to",
+      PILOT = UpdateFlight.pilotID,
+      PLANE = UpdateFlight.planeID,
+      TERMINAL = UpdateFlight.terminalID,
+      STATUS = UpdateFlight.statusID,
+      SCHEDULED_DEPARTURE = UpdateFlight.scheduledDeparture,
+      ACTUAL_DEPARTURE = UpdateFlight.actualDeparture,
+      SCHEDULED_ARRIVAL = UpdateFlight.scheduledArrival,
+      ACTUAL_ARRIVAL = UpdateFlight.actualArrival,
+      GATE = UpdateFlight.gate,
+      BAGGAGE_CLAIM = UpdateFlight.baggageClaim
+   WHERE id = UpdateFlight.ID;
 END;
 /
 
@@ -623,7 +623,7 @@ CREATE PROCEDURE DeleteFlight (
 )
 AS
 BEGIN
-   DELETE FROM flight WHERE id = ID;
+   DELETE FROM flight WHERE id = DeleteFlight.ID;
 END;
 /
 
@@ -632,7 +632,7 @@ CREATE PROCEDURE GetFlightStatusesByID (
 )
 AS
 BEGIN
-   SELECT * FROM flight_status WHERE id = ID;
+   SELECT * FROM flight_status WHERE id = GetFlightStatusesByID.ID;
 END;
 /
 
@@ -641,11 +641,11 @@ CREATE PROCEDURE GetMaintenanceLogByID (
 )
 AS
 BEGIN
-   SELECT * FROM maintenanceLog WHERE id = ID;
+   SELECT * FROM MAINTENANCE_LOG WHERE id = GetMaintenanceLogByID.ID;
 END;
 /
 
-CREATE PROCEDURE GeTicketByID (
+CREATE PROCEDURE GetTicketByID (
    ID VARCHAR2
 )
 AS
@@ -660,7 +660,7 @@ BEGIN
 		FLIGHT.GATE,
 		FLIGHT.BAGGAGE_CLAIM,
 		TICKET.STATUS FROM FLIGHT RIGHT JOIN TICKET ON TICKET.FLIGHT = FLIGHT.ID RIGHT JOIN TRAVEL_CLASS ON TICKET.TRAVEL_CLASS = TRAVEL_CLASS.ID 
-	WHERE TICKET.ID = ID;
+	WHERE TICKET.ID = GetTicketByID.ID;
 END;
 /
 
@@ -690,7 +690,7 @@ BEGIN
 	FROM TICKET 
 	LEFT JOIN FLIGHT ON TICKET.FLIGHT = FLIGHT.ID 
 	LEFT JOIN TRAVEL_CLASS ON TICKET.TRAVEL_CLASS = TRAVEL_CLASS.ID 
-	WHERE TICKET.AIRPORTUSER = userID
+	WHERE TICKET.AIRPORTUSER = GetTicketByUserID.userID
 	ORDER BY TICKET.BOOKING_DATE DESC;
 END;
 /
