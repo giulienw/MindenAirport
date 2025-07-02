@@ -91,6 +91,7 @@ export const authService = {
           phone: result.data.user.phone,
           birthDate: result.data.user.birthdate,
           active: result.data.user.active,
+          role: result.data.user.role,
         },
         token: result.data.token,
       };
@@ -154,6 +155,7 @@ export const authService = {
         phone: result.data.phone,
         birthDate: result.data.birthdate,
         active: result.data.active,
+        role: result.data.role,
       };
     } catch (error) {
       console.error('Failed to fetch user profile:', error);
