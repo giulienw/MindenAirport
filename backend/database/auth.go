@@ -2,6 +2,7 @@ package database
 
 import (
 	"database/sql"
+	"fmt"
 	"log"
 	"mindenairport/models"
 	"mindenairport/utils"
@@ -124,9 +125,10 @@ func (db Database) UpdateUserLastLogin(userID string) error {
 }
 
 // DeactivateUser deactivates a user account
-func (db Database) DeactivateUser(userID string) error {
-	query := `UPDATE AIRPORTUSER SET ACTIVE = 0 WHERE ID = :1`
-	_, err := db.Exec(query, userID)
+func (db Database) DeactivateUser(userID string, active int) error {
+	fmt.Println("Deactivating user:", userID, "Active:", active)
+	query := `UPDATE AIRPORTUSER SET ACTIVE = :1 WHERE ID = :2`
+	_, err := db.Exec(query, active, userID)
 	return err
 }
 

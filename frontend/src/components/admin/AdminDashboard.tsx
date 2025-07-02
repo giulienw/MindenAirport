@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Clock, Users, Plane, Package, AlertTriangle, DollarSign, Activity, TrendingUp } from 'lucide-react';
+import { Clock, Users, Plane, AlertTriangle, DollarSign, Activity, TrendingUp } from 'lucide-react';
 import { AdminStatsCard } from './AdminStatsCard';
 import { UserManagement } from './UserManagement';
 import { FlightManagement } from './FlightManagement';
@@ -44,8 +44,7 @@ export const AdminDashboard: React.FC = () => {
   const tabs = [
     { id: 'overview' as const, label: 'Overview', icon: TrendingUp },
     { id: 'users' as const, label: 'Users', icon: Users },
-    { id: 'flights' as const, label: 'Flights', icon: Plane },
-    { id: 'baggage' as const, label: 'Baggage', icon: Package }
+    { id: 'flights' as const, label: 'Flights', icon: Plane }
   ];
 
   const statsConfig = [

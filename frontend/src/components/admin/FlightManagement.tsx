@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Plane, Clock, MapPin, Users, DollarSign, Package, AlertTriangle, CheckCircle } from 'lucide-react';
-import type { FlightDisplayInfo, FlightManagement as FlightManagementType } from '@/types';
+import { Plane, Clock, MapPin, Users, AlertTriangle } from 'lucide-react';
+import type { FlightManagement as FlightManagementType } from '@/types';
 import { adminService, flightService } from '@/services';
 import { getFlightType, getFlightStatusColor as getStatusColor } from '@/lib/utils';
 
@@ -28,9 +28,9 @@ export const FlightManagement: React.FC = () => {
     }
   };
 
-  const handleUpdateStatus = async (flightId: string, newStatus: string, gate?: string) => {
+  const handleUpdateStatus = async (flightId: string, newStatus: string) => {
     try {
-      await adminService.updateFlightStatus(flightId, newStatus, gate);
+      await adminService.updateFlightStatus(flightId, Number(newStatus));
       await fetchFlights();
       setShowStatusModal(false);
       setSelectedFlight(null);
@@ -41,8 +41,6 @@ export const FlightManagement: React.FC = () => {
 
   const getStatusIcon = (status: string) => {
     switch (status.toLowerCase()) {
-      case 'on time':
-        return CheckCircle;
       case 'delayed':
         return Clock;
       case 'cancelled':
@@ -124,7 +122,7 @@ export const FlightManagement: React.FC = () => {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {flights.map((flight) => {
           const StatusIcon = getStatusIcon(flight.statusInfo?.name || '');
-          const occupancy = calculateOccupancy(flight.passengerCount, flight.capacity);
+          console.log(flight)
           
           return (
             <div key={flight.id} className="bg-white rounded-lg shadow-sm border border-gray-200 hover:shadow-md transition-shadow">
@@ -139,7 +137,7 @@ export const FlightManagement: React.FC = () => {
                         {(flight.statusInfo?.name || 'Unknown').replace('_', ' ').toUpperCase()}
                       </span>
                     </div>
-                    <p className="text-sm text-gray-600">{flight.airline?.name || 'Unknown Airline'}</p>
+                    {/*<p className="text-sm text-gray-600">{flight.airline?.name || 'Unknown Airline'}</p> */}
                   </div>
                   <button
                     onClick={() => {
@@ -181,56 +179,6 @@ export const FlightManagement: React.FC = () => {
                   </div>
                 </div>
 
-                {/* Stats */}
-                <div className="grid grid-cols-4 gap-4 pt-4 border-t border-gray-200">
-                  <div className="text-center">
-                    <div className="flex items-center justify-center mb-1">
-                      <Users className="w-4 h-4 text-blue-500" />
-                    </div>
-                    <p className="text-xs text-gray-500">Passengers</p>
-                    <p className="font-medium text-gray-900">{flight.passengerCount}/{flight.capacity}</p>
-                    <p className="text-xs text-gray-600">{occupancy}%</p>
-                  </div>
-                  <div className="text-center">
-                    <div className="flex items-center justify-center mb-1">
-                      <Package className="w-4 h-4 text-purple-500" />
-                    </div>
-                    <p className="text-xs text-gray-500">Baggage</p>
-                    <p className="font-medium text-gray-900">{flight.baggageCount}</p>
-                  </div>
-                  <div className="text-center">
-                    <div className="flex items-center justify-center mb-1">
-                      <CheckCircle className="w-4 h-4 text-green-500" />
-                    </div>
-                    <p className="text-xs text-gray-500">Checked In</p>
-                    <p className="font-medium text-gray-900">{flight.checkedInCount}</p>
-                  </div>
-                  <div className="text-center">
-                    <div className="flex items-center justify-center mb-1">
-                      <DollarSign className="w-4 h-4 text-emerald-500" />
-                    </div>
-                    <p className="text-xs text-gray-500">Revenue</p>
-                    <p className="font-medium text-gray-900">${(flight.revenue / 1000).toFixed(0)}k</p>
-                  </div>
-                </div>
-
-                {/* Occupancy Bar */}
-                <div className="mt-4">
-                  <div className="flex justify-between text-xs text-gray-500 mb-1">
-                    <span>Occupancy</span>
-                    <span>{occupancy}%</span>
-                  </div>
-                  <div className="w-full bg-gray-200 rounded-full h-2">
-                    <div
-                      className={`h-2 rounded-full transition-all duration-300 ${
-                        occupancy >= 90 ? 'bg-red-500' :
-                        occupancy >= 70 ? 'bg-orange-500' :
-                        'bg-green-500'
-                      }`}
-                      style={{ width: `${occupancy}%` }}
-                    />
-                  </div>
-                </div>
               </div>
             </div>
           );
@@ -260,11 +208,11 @@ export const FlightManagement: React.FC = () => {
                   defaultValue=""
                 >
                   <option value="">Select new status...</option>
-                  <option value="ON_TIME">On Time</option>
-                  <option value="DELAYED">Delayed</option>
-                  <option value="BOARDING">Boarding</option>
-                  <option value="DEPARTED">Departed</option>
-                  <option value="CANCELLED">Cancelled</option>
+                  <option value="5">Delayed</option>
+                  <option value="2">Boarding</option>
+                  <option value="3">Departed</option>
+                  <option value="6">Cancelled</option>
+                  <option value="4">Arrived</option> 
                 </select>
               </div>
             </div>

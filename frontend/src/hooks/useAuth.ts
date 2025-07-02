@@ -69,7 +69,7 @@ export function useAuth() {
       const authResponse = await authService.login(credentials);
       
       // Store auth data
-      localStorage.setItem('token', authResponse.token);
+      //localStorage.setItem('token', authResponse.token);
       localStorage.setItem('user', JSON.stringify(authResponse.user));
       
       setUser(authResponse.user);
@@ -103,7 +103,7 @@ export function useAuth() {
       const authResponse = await authService.register(data);
       
       // Store auth data
-      localStorage.setItem('token', authResponse.token);
+      //localStorage.setItem('token', authResponse.token);
       localStorage.setItem('user', JSON.stringify(authResponse.user));
       
       setUser(authResponse.user);

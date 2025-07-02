@@ -227,7 +227,16 @@ func DeactivateUser(db database.Database) gin.HandlerFunc {
 
 		userID := c.Param("id")
 
-		err := db.DeactivateUser(userID)
+		var requestData struct {
+			Active int `json:"active"`
+		}
+
+		if err := c.ShouldBindJSON(&requestData); err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request data"})
+			return
+		}
+
+		err := db.DeactivateUser(userID, requestData.Active)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to deactivate user"})
 			return

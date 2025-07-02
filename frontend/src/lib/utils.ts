@@ -16,8 +16,6 @@ export function getFlightType(flight: Flight): string {
 
 export const getFlightStatusColor = (status?: string) => {
   switch (status?.toLowerCase()) {
-    case 'on time':
-      return 'text-green-600 bg-green-100';
     case 'departed':
       return 'text-green-600 bg-green-100'
     case 'arrived':

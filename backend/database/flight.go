@@ -8,7 +8,7 @@ import (
 func (db Database) GetFlightByID(id string) models.Flight {
 	var flight models.Flight
 
-	err := db.QueryRow("SELECT * FROM flight WHERE id = :1", id).Scan(&flight.ID, &flight.From, &flight.To, &flight.Date, &flight.PilotID, &flight.PlaneID, &flight.TerminalID, &flight.StatusID, &flight.ScheduledDeparture, &flight.ActualDeparture, &flight.ScheduledArrival, &flight.ActualArrival, &flight.Gate, &flight.BaggageClaim)
+	err := db.QueryRow("SELECT ID, \"FROM\", \"TO\", PILOT, PLANE, TERMINAL, STATUS, SCHEDULED_DEPARTURE, ACTUAL_DEPARTURE, SCHEDULED_ARRIVAL, ACTUAL_ARRIVAL, GATE, BAGGAGE_CLAIM FROM FLIGHT WHERE ID = :1", id).Scan(&flight.ID, &flight.From, &flight.To, &flight.PilotID, &flight.PlaneID, &flight.TerminalID, &flight.StatusID, &flight.ScheduledDeparture, &flight.ActualDeparture, &flight.ScheduledArrival, &flight.ActualArrival, &flight.Gate, &flight.BaggageClaim)
 	if err != nil {
 		log.Fatal("Error querying the database:", err)
 	}
@@ -20,7 +20,7 @@ func (db Database) GetFlightByID(id string) models.Flight {
 func (db Database) GetFlights() []models.Flight {
 	var flights []models.Flight
 
-	rows, err := db.Query("SELECT * FROM flight")
+	rows, err := db.Query("SELECT ID, \"FROM\", \"TO\", PILOT, PLANE, TERMINAL, STATUS, SCHEDULED_DEPARTURE, ACTUAL_DEPARTURE, SCHEDULED_ARRIVAL, ACTUAL_ARRIVAL, GATE, BAGGAGE_CLAIM FROM FLIGHT")
 	if err != nil {
 		log.Fatal("Error querying the database:", err)
 	}
@@ -52,7 +52,7 @@ func (db Database) GetAllFlights(page, limit int) ([]models.Flight, int, error) 
 	offset := (page - 1) * limit
 
 	// Get flights with pagination
-	query := `SELECT * FROM FLIGHT ORDER BY ID DESC OFFSET :1 ROWS FETCH NEXT :2 ROWS ONLY`
+	query := `SELECT ID, "FROM", "TO", PILOT, PLANE, TERMINAL, STATUS, SCHEDULED_DEPARTURE, ACTUAL_DEPARTURE, SCHEDULED_ARRIVAL, ACTUAL_ARRIVAL, GATE, BAGGAGE_CLAIM FROM FLIGHT ORDER BY ID DESC OFFSET :1 ROWS FETCH NEXT :2 ROWS ONLY`
 
 	rows, err := db.Query(query, offset, limit)
 	if err != nil {
@@ -66,7 +66,6 @@ func (db Database) GetAllFlights(page, limit int) ([]models.Flight, int, error) 
 			&flight.ID,
 			&flight.From,
 			&flight.To,
-			&flight.Date,
 			&flight.PilotID,
 			&flight.PlaneID,
 			&flight.TerminalID,
@@ -92,21 +91,35 @@ func (db Database) GetAllFlights(page, limit int) ([]models.Flight, int, error) 
 }
 
 func (db Database) CreateFlight(flight models.Flight) {
-	_, err := db.Exec("INSERT INTO flight (id, from, to, date, pilot_id, plane_id, terminal_id, status_id, scheduled_departure, actual_departure, scheduled_arrival, actual_arrival, gate, baggage_claim) VALUES (:1, :2, :3, :4, :5, :6, :7, :8, :9, :10, :11, :12, :13, :14)", flight.ID, flight.From, flight.To, flight.Date, flight.PilotID, flight.PlaneID, flight.TerminalID, flight.StatusID, flight.ScheduledDeparture, flight.ActualDeparture, flight.ScheduledArrival, flight.ActualArrival, flight.Gate, flight.BaggageClaim)
+	_, err := db.Exec("INSERT INTO FLIGHT (ID, \"FROM\", \"TO\", PILOT, PLANE, TERMINAL, STATUS, SCHEDULED_DEPARTURE, ACTUAL_DEPARTURE, SCHEDULED_ARRIVAL, ACTUAL_ARRIVAL, GATE, BAGGAGE_CLAIM) VALUES (:1, :2, :3, :4, :5, :6, :7, :8, :9, :10, :11, :12, :13)", flight.ID, flight.From, flight.To, flight.PilotID, flight.PlaneID, flight.TerminalID, flight.StatusID, flight.ScheduledDeparture, flight.ActualDeparture, flight.ScheduledArrival, flight.ActualArrival, flight.Gate, flight.BaggageClaim)
 	if err != nil {
 		log.Fatal("Error inserting into the database:", err)
 	}
 }
 
 func (db Database) UpdateFlight(flight models.Flight) {
-	_, err := db.Exec("UPDATE flight SET \"from\" = :1, \"to\" = :2, date = :3, pilot_id = :4, plane_id = :5, terminal_id = :6, status_id = :7, scheduled_departure = :8, actual_departure = :9, scheduled_arrival = :10, actual_arrival = :11, gate = :12, baggage_claim = :13 WHERE id = :14", flight.From, flight.To, flight.Date, flight.PilotID, flight.PlaneID, flight.TerminalID, flight.StatusID, flight.ScheduledDeparture, flight.ActualDeparture, flight.ScheduledArrival, flight.ActualArrival, flight.Gate, flight.BaggageClaim, flight.ID)
+	query := `UPDATE FLIGHT SET 
+	"FROM" = :1, 
+	"TO" = :2, 
+	PILOT = :3, 
+	PLANE = :4, 
+	TERMINAL = :5, 
+	STATUS = :6, 
+	SCHEDULED_DEPARTURE = :7, 
+	ACTUAL_DEPARTURE = :8, 
+	SCHEDULED_ARRIVAL = :9, 
+	ACTUAL_ARRIVAL = :10, 
+	GATE = :11, 
+	BAGGAGE_CLAIM = :12 
+	WHERE ID = :13`
+	_, err := db.Exec(query, flight.From, flight.To, flight.PilotID, flight.PlaneID, flight.TerminalID, flight.StatusID, flight.ScheduledDeparture, flight.ActualDeparture, flight.ScheduledArrival, flight.ActualArrival, flight.Gate, flight.BaggageClaim, flight.ID)
 	if err != nil {
 		log.Fatal("Error updating the database:", err)
 	}
 }
 
 func (db Database) DeleteFlight(id string) {
-	_, err := db.Exec("DELETE FROM flight WHERE id = :1", id)
+	_, err := db.Exec("DELETE FROM FLIGHT WHERE ID = :1", id)
 	if err != nil {
 		log.Fatal("Error deleting from the database:", err)
 	}
