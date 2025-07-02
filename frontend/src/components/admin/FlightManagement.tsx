@@ -20,7 +20,7 @@ export const FlightManagement: React.FC = () => {
       setLoading(true);
       setError(null);
       const result = await flightService.getEnrichedFlights();
-      setFlights(result);
+      setFlights(result as FlightManagementType[]);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to fetch flights');
     } finally {
@@ -66,10 +66,6 @@ export const FlightManagement: React.FC = () => {
       month: 'short',
       day: 'numeric',
     });
-  };
-
-  const calculateOccupancy = (passengerCount: number, capacity: number) => {
-    return Math.round((passengerCount / capacity) * 100);
   };
 
   if (loading) {
