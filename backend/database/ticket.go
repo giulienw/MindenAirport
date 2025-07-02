@@ -1,25 +1,28 @@
 package database
 
 import (
+	"database/sql"
 	"log"
 	"mindenairport/models"
 )
 
 func (db Database) GetTicketByID(id string) models.Ticket {
+	query := `BEGIN GetTicketByID(:1, :2); END;`
+
+	var cursor *sql.Rows
+	_, err := db.Exec(query, id, sql.Out{Dest: &cursor})
+	if err != nil {
+		log.Fatal("Error calling stored procedure:", err)
+	}
+	defer cursor.Close()
+
 	var ticket models.Ticket
 
-	query := `SELECT TICKET.ID,
-		TICKET.SEAT_NUMBER,
-		FLIGHT."FROM",FLIGHT."TO",TICKET.BOOKING_DATE, 
-		CASE WHEN FLIGHT.SCHEDULED_DEPARTURE = FLIGHT.ACTUAL_DEPARTURE THEN TO_CHAR(FLIGHT.SCHEDULED_DEPARTURE, 'dd.mm.yyyy HH24:MI') ELSE TO_CHAR(FLIGHT.ACTUAL_DEPARTURE, 'dd.mm.yyyy HH24:MI') END AS DEPARTURE_TIME,
-		TRAVEL_CLASS.NAME AS TRAVEL_CLASS,TICKET.PRICE,
-		FLIGHT.GATE,
-		FLIGHT.BAGGAGE_CLAIM,
-		TICKET.STATUS FROM FLIGHT RIGHT JOIN TICKET ON TICKET.FLIGHT = FLIGHT.ID RIGHT JOIN TRAVEL_CLASS ON TICKET.TRAVEL_CLASS = TRAVEL_CLASS.ID 
-		WHERE TICKET.ID = :1;`
-	err := db.QueryRow(query, id).Scan(&ticket.ID, &ticket.SeatNumber, &ticket.From, &ticket.To, &ticket.BookingDate, &ticket.DepartureTime, &ticket.TravelClass, &ticket.Price, &ticket.Gate, &ticket.BaggageClaim, &ticket.Status)
-	if err != nil {
-		log.Fatal("Error querying the database:", err)
+	if cursor.Next() {
+		err := cursor.Scan(&ticket.ID, &ticket.SeatNumber, &ticket.From, &ticket.To, &ticket.BookingDate, &ticket.DepartureTime, &ticket.TravelClass, &ticket.Price, &ticket.Gate, &ticket.BaggageClaim, &ticket.Status)
+		if err != nil {
+			log.Fatal("Error scanning ticket data:", err)
+		}
 	}
 
 	return ticket
@@ -27,41 +30,20 @@ func (db Database) GetTicketByID(id string) models.Ticket {
 
 // GetTicketsByUserID retrieves all tickets for a specific user
 func (db Database) GetTicketsByUserID(userID string) ([]models.Ticket, error) {
-	var tickets []models.Ticket
+	query := `BEGIN GetTicketsByUserID(:1, :2); END;`
 
-	query := `SELECT 
-		TICKET.ID,
-		TICKET.SEAT_NUMBER,
-		FLIGHT."FROM",
-		FLIGHT."TO",
-		TICKET.BOOKING_DATE,
-		CASE 
-			WHEN FLIGHT.SCHEDULED_DEPARTURE = FLIGHT.ACTUAL_DEPARTURE 
-			THEN TO_CHAR(FLIGHT.SCHEDULED_DEPARTURE, 'dd.mm.yyyy HH24:MI') 
-			ELSE TO_CHAR(FLIGHT.ACTUAL_DEPARTURE, 'dd.mm.yyyy HH24:MI') 
-		END AS DEPARTURE_TIME,
-		TRAVEL_CLASS.NAME AS TRAVEL_CLASS,
-		TICKET.PRICE,
-		FLIGHT.GATE,
-		FLIGHT.BAGGAGE_CLAIM,
-		TICKET.STATUS,
-		TICKET.AIRPORTUSER,
-		TICKET.FLIGHT
-	FROM TICKET 
-	LEFT JOIN FLIGHT ON TICKET.FLIGHT = FLIGHT.ID 
-	LEFT JOIN TRAVEL_CLASS ON TICKET.TRAVEL_CLASS = TRAVEL_CLASS.ID 
-	WHERE TICKET.AIRPORTUSER = :1
-	ORDER BY TICKET.BOOKING_DATE DESC`
-
-	rows, err := db.Query(query, userID)
+	var cursor *sql.Rows
+	_, err := db.Exec(query, userID, sql.Out{Dest: &cursor})
 	if err != nil {
 		return nil, err
 	}
-	defer rows.Close()
+	defer cursor.Close()
 
-	for rows.Next() {
+	var tickets []models.Ticket
+
+	for cursor.Next() {
 		var ticket models.Ticket
-		err := rows.Scan(
+		err := cursor.Scan(
 			&ticket.ID,
 			&ticket.SeatNumber,
 			&ticket.From,
@@ -82,7 +64,7 @@ func (db Database) GetTicketsByUserID(userID string) ([]models.Ticket, error) {
 		tickets = append(tickets, ticket)
 	}
 
-	if err = rows.Err(); err != nil {
+	if err = cursor.Err(); err != nil {
 		return nil, err
 	}
 
@@ -94,9 +76,9 @@ func (db Database) GetAllTickets(page, limit int) ([]models.Ticket, int, error) 
 	var tickets []models.Ticket
 	var total int
 
-	// First get the total count
-	countQuery := `SELECT COUNT(*) FROM TICKET`
-	err := db.QueryRow(countQuery).Scan(&total)
+	// First get the total count using stored procedure
+	countQuery := `BEGIN GetTicketCount(:1); END;`
+	_, err := db.Exec(countQuery, sql.Out{Dest: &total})
 	if err != nil {
 		return nil, 0, err
 	}
@@ -104,40 +86,18 @@ func (db Database) GetAllTickets(page, limit int) ([]models.Ticket, int, error) 
 	// Calculate offset
 	offset := (page - 1) * limit
 
-	// Get tickets with pagination and flight information
-	query := `SELECT 
-		TICKET.ID,
-		TICKET.SEAT_NUMBER,
-		FLIGHT."FROM",
-		FLIGHT."TO",
-		TICKET.BOOKING_DATE,
-		CASE 
-			WHEN FLIGHT.SCHEDULED_DEPARTURE = FLIGHT.ACTUAL_DEPARTURE 
-			THEN TO_CHAR(FLIGHT.SCHEDULED_DEPARTURE, 'dd.mm.yyyy HH24:MI') 
-			ELSE TO_CHAR(FLIGHT.ACTUAL_DEPARTURE, 'dd.mm.yyyy HH24:MI') 
-		END AS DEPARTURE_TIME,
-		TRAVEL_CLASS.NAME AS TRAVEL_CLASS,
-		TICKET.PRICE,
-		FLIGHT.GATE,
-		FLIGHT.BAGGAGE_CLAIM,
-		TICKET.STATUS,
-		TICKET.AIRPORTUSER,
-		TICKET.FLIGHT
-	FROM TICKET 
-	LEFT JOIN FLIGHT ON TICKET.FLIGHT = FLIGHT.ID 
-	LEFT JOIN TRAVEL_CLASS ON TICKET.TRAVEL_CLASS = TRAVEL_CLASS.ID 
-	ORDER BY TICKET.BOOKING_DATE DESC
-	OFFSET :1 ROWS FETCH NEXT :2 ROWS ONLY`
-
-	rows, err := db.Query(query, offset, limit)
+	// Get tickets with pagination using stored procedure
+	query := `BEGIN GetAllTickets(:1, :2, :3); END;`
+	var cursor *sql.Rows
+	_, err = db.Exec(query, offset, limit, sql.Out{Dest: &cursor})
 	if err != nil {
 		return nil, 0, err
 	}
-	defer rows.Close()
+	defer cursor.Close()
 
-	for rows.Next() {
+	for cursor.Next() {
 		var ticket models.Ticket
-		err := rows.Scan(
+		err := cursor.Scan(
 			&ticket.ID,
 			&ticket.SeatNumber,
 			&ticket.From,
@@ -158,7 +118,7 @@ func (db Database) GetAllTickets(page, limit int) ([]models.Ticket, int, error) 
 		tickets = append(tickets, ticket)
 	}
 
-	if err = rows.Err(); err != nil {
+	if err = cursor.Err(); err != nil {
 		return nil, 0, err
 	}
 
@@ -168,10 +128,9 @@ func (db Database) GetAllTickets(page, limit int) ([]models.Ticket, int, error) 
 func (db Database) CalculateRevenue() (int, error) {
 	var total int
 
-	// Get tickets with pagination and flight information
-	query := `SELECT SUM(PRICE) FROM TICKET`
-
-	err := db.QueryRow(query).Scan(&total)
+	// Call stored procedure
+	query := `BEGIN CalculateRevenue(:1); END;`
+	_, err := db.Exec(query, sql.Out{Dest: &total})
 	if err != nil {
 		return 0, err
 	}

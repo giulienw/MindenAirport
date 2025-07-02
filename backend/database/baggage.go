@@ -10,47 +10,53 @@ import (
 
 // GetBaggageByID retrieves a specific baggage by ID
 func (db Database) GetBaggageByID(id string) (*models.Baggage, error) {
-	var baggage models.Baggage
+	query := `BEGIN GetBaggageByID(:1, :2); END;`
 
-	query := `SELECT ID, AIRPORTUSER, FLIGHT, SIZE, WEIGHT, TRACKING_NUMBER, STATUS, SPECIAL_HANDLING 
-			  FROM BAGGAGE WHERE ID = :1`
-
-	err := db.QueryRow(query, id).Scan(
-		&baggage.ID,
-		&baggage.AirportUserID,
-		&baggage.FlightID,
-		&baggage.Size,
-		&baggage.Weight,
-		&baggage.TrackingNumber,
-		&baggage.Status,
-		&baggage.SpecialHandling,
-	)
-
+	var cursor *sql.Rows
+	_, err := db.Exec(query, id, sql.Out{Dest: &cursor})
 	if err != nil {
-		if err == sql.ErrNoRows {
-			return nil, nil
-		}
 		return nil, err
 	}
+	defer cursor.Close()
 
-	return &baggage, nil
+	var baggage models.Baggage
+
+	if cursor.Next() {
+		err := cursor.Scan(
+			&baggage.ID,
+			&baggage.AirportUserID,
+			&baggage.FlightID,
+			&baggage.Size,
+			&baggage.Weight,
+			&baggage.TrackingNumber,
+			&baggage.Status,
+			&baggage.SpecialHandling,
+		)
+		if err != nil {
+			return nil, err
+		}
+		return &baggage, nil
+	}
+
+	return nil, nil
 }
 
 // GetBaggageByUserID retrieves all baggage for a specific user
 func (db Database) GetBaggageByUserID(userID string) ([]models.Baggage, error) {
-	var baggageList []models.Baggage
+	query := `BEGIN GetBaggageByUserID(:1, :2); END;`
 
-	query := `SELECT * FROM BAGGAGE WHERE AIRPORTUSER = :1 ORDER BY ID DESC`
-
-	rows, err := db.Query(query, userID)
+	var cursor *sql.Rows
+	_, err := db.Exec(query, userID, sql.Out{Dest: &cursor})
 	if err != nil {
 		return nil, err
 	}
-	defer rows.Close()
+	defer cursor.Close()
 
-	for rows.Next() {
+	var baggageList []models.Baggage
+
+	for cursor.Next() {
 		var baggage models.Baggage
-		err := rows.Scan(
+		err := cursor.Scan(
 			&baggage.ID,
 			&baggage.AirportUserID,
 			&baggage.FlightID,
@@ -66,7 +72,7 @@ func (db Database) GetBaggageByUserID(userID string) ([]models.Baggage, error) {
 		baggageList = append(baggageList, baggage)
 	}
 
-	if err = rows.Err(); err != nil {
+	if err = cursor.Err(); err != nil {
 		return nil, err
 	}
 
@@ -75,20 +81,20 @@ func (db Database) GetBaggageByUserID(userID string) ([]models.Baggage, error) {
 
 // GetBaggageByFlightID retrieves all baggage for a specific flight
 func (db Database) GetBaggageByFlightID(flightID string) ([]models.Baggage, error) {
-	var baggageList []models.Baggage
+	query := `BEGIN GetBaggageByFlightID(:1, :2); END;`
 
-	query := `SELECT ID, AIRPORTUSER, FLIGHT, SIZE, WEIGHT, TRACKING_NUMBER, STATUS, SPECIAL_HANDLING 
-			  FROM BAGGAGE WHERE FLIGHT = :1 ORDER BY ID DESC`
-
-	rows, err := db.Query(query, flightID)
+	var cursor *sql.Rows
+	_, err := db.Exec(query, flightID, sql.Out{Dest: &cursor})
 	if err != nil {
 		return nil, err
 	}
-	defer rows.Close()
+	defer cursor.Close()
 
-	for rows.Next() {
+	var baggageList []models.Baggage
+
+	for cursor.Next() {
 		var baggage models.Baggage
-		err := rows.Scan(
+		err := cursor.Scan(
 			&baggage.ID,
 			&baggage.AirportUserID,
 			&baggage.FlightID,
@@ -104,7 +110,7 @@ func (db Database) GetBaggageByFlightID(flightID string) ([]models.Baggage, erro
 		baggageList = append(baggageList, baggage)
 	}
 
-	if err = rows.Err(); err != nil {
+	if err = cursor.Err(); err != nil {
 		return nil, err
 	}
 
@@ -123,9 +129,8 @@ func (db Database) CreateBaggage(baggage models.Baggage) (*models.Baggage, error
 		baggage.TrackingNumber = "BAG" + uuid.New().String()[:8]
 	}
 
-	query := `INSERT INTO BAGGAGE (ID, AIRPORTUSER, FLIGHT, SIZE, WEIGHT, TRACKING_NUMBER, STATUS, SPECIAL_HANDLING)
-			  VALUES (:1, :2, :3, :4, :5, :6, :7, :8)`
-
+	// Call stored procedure
+	query := `BEGIN CreateBaggage(:1, :2, :3, :4, :5, :6, :7, :8); END;`
 	_, err := db.Exec(query,
 		baggage.ID,
 		baggage.AirportUserID,
@@ -147,12 +152,10 @@ func (db Database) CreateBaggage(baggage models.Baggage) (*models.Baggage, error
 
 // UpdateBaggage updates an existing baggage entry
 func (db Database) UpdateBaggage(id string, baggage models.Baggage) (*models.Baggage, error) {
-	query := `UPDATE BAGGAGE SET 
-			  AIRPORTUSER = :1, FLIGHT = :2, SIZE = :3, WEIGHT = :4, 
-			  TRACKING_NUMBER = :5, STATUS = :6, SPECIAL_HANDLING = :7
-			  WHERE ID = :8`
-
-	result, err := db.Exec(query,
+	// Call stored procedure
+	query := `BEGIN UpdateBaggage(:1, :2, :3, :4, :5, :6, :7, :8); END;`
+	_, err := db.Exec(query,
+		id,
 		baggage.AirportUserID,
 		baggage.FlightID,
 		baggage.Size,
@@ -160,20 +163,10 @@ func (db Database) UpdateBaggage(id string, baggage models.Baggage) (*models.Bag
 		baggage.TrackingNumber,
 		baggage.Status,
 		baggage.SpecialHandling,
-		id,
 	)
 
 	if err != nil {
 		return nil, err
-	}
-
-	rowsAffected, err := result.RowsAffected()
-	if err != nil {
-		return nil, err
-	}
-
-	if rowsAffected == 0 {
-		return nil, sql.ErrNoRows
 	}
 
 	// Set the ID and return the updated baggage
@@ -183,51 +176,43 @@ func (db Database) UpdateBaggage(id string, baggage models.Baggage) (*models.Bag
 
 // DeleteBaggage deletes a baggage entry
 func (db Database) DeleteBaggage(id string) error {
-	query := `DELETE FROM BAGGAGE WHERE ID = :1`
-
-	result, err := db.Exec(query, id)
-	if err != nil {
-		return err
-	}
-
-	rowsAffected, err := result.RowsAffected()
-	if err != nil {
-		return err
-	}
-
-	if rowsAffected == 0 {
-		return sql.ErrNoRows
-	}
-
-	return nil
+	// Call stored procedure
+	query := `BEGIN DeleteBaggage(:1); END;`
+	_, err := db.Exec(query, id)
+	return err
 }
 
 // GetBaggageByTrackingNumber retrieves baggage by tracking number
 func (db Database) GetBaggageByTrackingNumber(trackingNumber string) (*models.Baggage, error) {
-	var baggage models.Baggage
+	query := `BEGIN GetBaggageByTrackingNumber(:1, :2); END;`
 
-	query := `SELECT ID, AIRPORTUSER, FLIGHT, SIZE, WEIGHT, TRACKING_NUMBER, STATUS, SPECIAL_HANDLING 
-			  FROM BAGGAGE WHERE TRACKING_NUMBER = :1`
-
-	err := db.QueryRow(query, trackingNumber).Scan(
-		&baggage.ID,
-		&baggage.AirportUserID,
-		&baggage.FlightID,
-		&baggage.Size,
-		&baggage.Weight,
-		&baggage.TrackingNumber,
-		&baggage.Status,
-		&baggage.SpecialHandling,
-	)
-
+	var cursor *sql.Rows
+	_, err := db.Exec(query, trackingNumber, sql.Out{Dest: &cursor})
 	if err != nil {
-		if err == sql.ErrNoRows {
-			return nil, nil
-		}
 		return nil, err
 	}
+	defer cursor.Close()
 
-	return &baggage, nil
+	var baggage models.Baggage
+
+	if cursor.Next() {
+		err := cursor.Scan(
+			&baggage.ID,
+			&baggage.AirportUserID,
+			&baggage.FlightID,
+			&baggage.Size,
+			&baggage.Weight,
+			&baggage.TrackingNumber,
+			&baggage.Status,
+			&baggage.SpecialHandling,
+		)
+		if err != nil {
+			return nil, err
+		}
+		return &baggage, nil
+	}
+
+	return nil, nil
 }
 
 // GetAllBaggage retrieves all baggage with pagination for admin
@@ -235,9 +220,9 @@ func (db Database) GetAllBaggage(page, limit int) ([]models.Baggage, int, error)
 	var baggageList []models.Baggage
 	var total int
 
-	// First get the total count
-	countQuery := `SELECT COUNT(*) FROM BAGGAGE`
-	err := db.QueryRow(countQuery).Scan(&total)
+	// First get the total count using stored procedure
+	countQuery := `BEGIN GetBaggageCount(:1); END;`
+	_, err := db.Exec(countQuery, sql.Out{Dest: &total})
 	if err != nil {
 		return nil, 0, err
 	}
@@ -245,21 +230,18 @@ func (db Database) GetAllBaggage(page, limit int) ([]models.Baggage, int, error)
 	// Calculate offset
 	offset := (page - 1) * limit
 
-	// Get baggage with pagination
-	query := `SELECT ID, AIRPORTUSER, FLIGHT, SIZE, WEIGHT, TRACKING_NUMBER, STATUS, SPECIAL_HANDLING 
-			  FROM BAGGAGE 
-			  ORDER BY ID DESC
-			  OFFSET :1 ROWS FETCH NEXT :2 ROWS ONLY`
-
-	rows, err := db.Query(query, offset, limit)
+	// Get baggage with pagination using stored procedure
+	query := `BEGIN GetAllBaggage(:1, :2, :3); END;`
+	var cursor *sql.Rows
+	_, err = db.Exec(query, offset, limit, sql.Out{Dest: &cursor})
 	if err != nil {
 		return nil, 0, err
 	}
-	defer rows.Close()
+	defer cursor.Close()
 
-	for rows.Next() {
+	for cursor.Next() {
 		var baggage models.Baggage
-		err := rows.Scan(
+		err := cursor.Scan(
 			&baggage.ID,
 			&baggage.AirportUserID,
 			&baggage.FlightID,
@@ -275,7 +257,7 @@ func (db Database) GetAllBaggage(page, limit int) ([]models.Baggage, int, error)
 		baggageList = append(baggageList, baggage)
 	}
 
-	if err = rows.Err(); err != nil {
+	if err = cursor.Err(); err != nil {
 		return nil, 0, err
 	}
 

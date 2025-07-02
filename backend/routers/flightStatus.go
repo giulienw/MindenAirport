@@ -2,6 +2,7 @@ package routers
 
 import (
 	"net/http"
+	"strconv"
 
 	"mindenairport/database"
 
@@ -19,7 +20,11 @@ func GetFlightStatuses(db database.Database) gin.HandlerFunc {
 
 func GetFlightStatusByID(db database.Database) gin.HandlerFunc {
 	fn := func(c *gin.Context) {
-		id := c.Param("id")
+		id, err := strconv.Atoi(c.Param("id"))
+		if err != nil {
+			// ... handle error
+			panic(err)
+		}
 		c.IndentedJSON(http.StatusOK, db.GetFlightStatusByID(id))
 	}
 
