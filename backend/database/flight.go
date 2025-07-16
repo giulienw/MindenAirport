@@ -21,11 +21,11 @@ func (db Database) GetFlightByID(id string) models.Flight {
 	if cursor.Next() {
 		err := cursor.Scan(&flight.ID, &flight.From, &flight.To, &flight.PilotID, &flight.PlaneID, &flight.TerminalID, &flight.StatusID, &flight.ScheduledDeparture, &flight.ActualDeparture, &flight.ScheduledArrival, &flight.ActualArrival, &flight.Gate, &flight.BaggageClaim)
 		if err != nil {
-			log.Fatal("Error scanning flight data:", err)
+			return models.Flight{}, fmt.Errorf("error scanning flight data: %w", err)
 		}
 	}
 
-	return flight
+	return flight, nil
 }
 
 // Deprecated: Because missing error handling and not using context. Use GetAllFlights instead
