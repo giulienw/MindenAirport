@@ -6,7 +6,7 @@ import (
 	"mindenairport/models"
 )
 
-func (db Database) GetTicketByID(id string) models.Ticket {
+func (db Database) GetTicketByID(id string) (models.Ticket, error) {
 	query := `BEGIN GetTicketByID(:1, :2); END;`
 
 	var cursor *sql.Rows

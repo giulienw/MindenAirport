@@ -20,7 +20,14 @@ func GetFlights(db database.Database) gin.HandlerFunc {
 func GetFlightByID(db database.Database) gin.HandlerFunc {
 	fn := func(c *gin.Context) {
 		id := c.Param("id")
-		c.IndentedJSON(http.StatusOK, db.GetFlightByID(id))
+		flight, err := db.GetFlightByID(id)
+
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to retrieve flight"})
+			return
+		}
+
+		c.IndentedJSON(http.StatusOK, flight)
 	}
 
 	return gin.HandlerFunc(fn)

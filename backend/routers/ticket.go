@@ -12,7 +12,14 @@ import (
 func GetTicketByID(db database.Database) gin.HandlerFunc {
 	fn := func(c *gin.Context) {
 		id := c.Param("id")
-		c.IndentedJSON(http.StatusOK, db.GetTicketByID(id))
+
+		ticket, err := db.GetTicketByID(id)
+
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to retrieve ticket"})
+			return
+		}
+		c.IndentedJSON(http.StatusOK, ticket)
 	}
 
 	return gin.HandlerFunc(fn)

@@ -2,11 +2,12 @@ package database
 
 import (
 	"database/sql"
+	"fmt"
 	"log"
 	"mindenairport/models"
 )
 
-func (db Database) GetFlightByID(id string) models.Flight {
+func (db Database) GetFlightByID(id string) (models.Flight, error) {
 	query := `BEGIN GetFlightByID(:1, :2); END;`
 
 	var cursor *sql.Rows
