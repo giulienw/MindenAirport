@@ -563,7 +563,7 @@ END;
 /
 
 -- Fix UpdateFlight procedure to match new schema
-CREATE OR REPLACE PROCEDURE UpdateFlightFixed (
+CREATE OR REPLACE PROCEDURE UpdateFlight (
    flight_from VARCHAR2,
    flight_to VARCHAR2,
    pilotID VARCHAR2,
