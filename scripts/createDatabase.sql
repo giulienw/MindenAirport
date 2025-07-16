@@ -57,7 +57,7 @@ create table TRAVEL_CLASS (
 /*==============================================================*/
 create table BAGGAGE (
    ID                   VARCHAR2(36)          not null,
-   AIRPORTUSER               VARCHAR2(36)          not null,
+   AIRPORTUSER          VARCHAR2(36)          not null,
    FLIGHT               VARCHAR2(36)          not null,
    "SIZE"               INT                   not null,
    WEIGHT              NUMBER(5,2)           not null,
@@ -274,6 +274,8 @@ create table AIRPORTUSER (
    ACTIVE               NUMBER(1)             not null,
    EMAIL               VARCHAR2(255),
    PHONE               VARCHAR2(50),
+   ROLE                VARCHAR2(50)          default 'USER',
+   CONSTRAINT CK_AIRPORTUSER_ROLE check (ROLE in ('USER','ADMIN','STAFF', 'MANAGER')),
    constraint PK_AIRPORTUSER primary key (ID),
    constraint CK_AIRPORTUSER_ACTIVE check (ACTIVE in (0,1))
 );

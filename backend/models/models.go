@@ -124,4 +124,5 @@ type AirportUser struct {
 	Active    bool      `json:"active"`
 	Email     string    `json:"email,omitempty"`
 	Phone     string    `json:"phone,omitempty"`
+	Role      string    `json:"role"`
 }
