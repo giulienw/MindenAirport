@@ -65,7 +65,7 @@ export const UserManagement: React.FC = () => {
     return new Date(dateString).toLocaleDateString();
   };
 
-  const formatLastLogin = (dateString?: string) => {
+  /*const formatLastLogin = (dateString?: string) => {
     if (!dateString) return 'Never';
     const date = new Date(dateString);
     const now = new Date();
@@ -75,7 +75,7 @@ export const UserManagement: React.FC = () => {
     if (diffInHours < 24) return `${diffInHours}h ago`;
     if (diffInHours < 168) return `${Math.floor(diffInHours / 24)}d ago`;
     return date.toLocaleDateString();
-  };
+  };*/
 
   const totalPages = Math.ceil(totalUsers / usersPerPage);
 
@@ -143,9 +143,9 @@ export const UserManagement: React.FC = () => {
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Status
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                {/*<th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Last Login
-                </th>
+                </th>*/}
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Tickets
                 </th>
@@ -203,15 +203,15 @@ export const UserManagement: React.FC = () => {
                       )}
                     </span>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                  {/*<td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                     {formatLastLogin(user.lastLogin)}
-                  </td>
+                  </td>*/}
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                     {user.ticketCount || 0}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 flex items-center">
                     <Calendar className="w-4 h-4 mr-1" />
-                    {formatDate(user.birthDate || "")}
+                    {formatDate(user.birthdate || "")}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                     <div className="relative">
@@ -230,18 +230,6 @@ export const UserManagement: React.FC = () => {
                               className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                             >
                               {user.active ? 'Deactivate User' : 'Activate User'}
-                            </button>
-                            <button
-                              className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                              onClick={() => setActiveDropdown(null)}
-                            >
-                              View Details
-                            </button>
-                            <button
-                              className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                              onClick={() => setActiveDropdown(null)}
-                            >
-                              Reset Password
                             </button>
                           </div>
                         </div>
