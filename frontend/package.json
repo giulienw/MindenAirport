@@ -7,13 +7,12 @@
   "type": "module",
   "main": "dist-electron/main.js",
   "scripts": {
-    "dev": "vite",
     "lint": "eslint .",
     "preview": "vite preview",
     "build:web": "tsc -b && vite build",
     "build:electron": "tsc -b && vite build && electron-builder",
     "electron": "electron .",
-    "dev:electron": "vite --mode electron",
+    "dev": "vite --mode electron",
     "start:electron": "npm run build:web && electron ."
   },
   "dependencies": {

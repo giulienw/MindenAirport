@@ -1,38 +1,53 @@
 package database
 
 import (
+	"database/sql"
 	"log"
 	"mindenairport/models"
 )
 
-func (db Database) GetFlightStatusByID(id string) models.FlightStatus {
-	var flightStatus models.FlightStatus
-
-	err := db.QueryRow("SELECT * FROM flight_status WHERE id = :1", id).Scan(&flightStatus.ID, &flightStatus.Name)
-	if err != nil {
-		log.Fatal("Error querying the database:", err)
-	}
-
-	return flightStatus
-}
-
 func (db Database) GetFlightStatuses() []models.FlightStatus {
+	query := `BEGIN GetFlightStatuses(:1); END;`
+
+	var cursor *sql.Rows
+	_, err := db.Exec(query, sql.Out{Dest: &cursor})
+	if err != nil {
+		log.Fatal("Error calling stored procedure:", err)
+	}
+	defer cursor.Close()
+
 	var flightStatuses []models.FlightStatus
 
-	rows, err := db.Query("SELECT ID,NAME,DESCRIPTION FROM flight_status")
-	if err != nil {
-		log.Fatal("Error querying the database:", err)
-	}
-	defer rows.Close()
-
-	for rows.Next() {
+	for cursor.Next() {
 		var flightStatus models.FlightStatus
-		err := rows.Scan(&flightStatus.ID, &flightStatus.Name, &flightStatus.Description)
+		err := cursor.Scan(&flightStatus.ID, &flightStatus.Name, &flightStatus.Description)
 		if err != nil {
-			log.Fatal("Error scanning the database:", err)
+			log.Fatal("Error scanning flight status data:", err)
 		}
 		flightStatuses = append(flightStatuses, flightStatus)
 	}
 
 	return flightStatuses
+}
+
+func (db Database) GetFlightStatusByID(id int) models.FlightStatus {
+	query := `BEGIN GetFlightStatusByID(:1, :2); END;`
+
+	var cursor *sql.Rows
+	_, err := db.Exec(query, id, sql.Out{Dest: &cursor})
+	if err != nil {
+		log.Fatal("Error calling stored procedure:", err)
+	}
+	defer cursor.Close()
+
+	var flightStatus models.FlightStatus
+
+	if cursor.Next() {
+		err := cursor.Scan(&flightStatus.ID, &flightStatus.Name, &flightStatus.Description)
+		if err != nil {
+			log.Fatal("Error scanning flight status data:", err)
+		}
+	}
+
+	return flightStatus
 }

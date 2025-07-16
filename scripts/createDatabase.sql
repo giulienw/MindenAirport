@@ -57,7 +57,7 @@ create table TRAVEL_CLASS (
 /*==============================================================*/
 create table BAGGAGE (
    ID                   VARCHAR2(36)          not null,
-   AIRPORTUSER               VARCHAR2(36)          not null,
+   AIRPORTUSER          VARCHAR2(36)          not null,
    FLIGHT               VARCHAR2(36)          not null,
    "SIZE"               INT                   not null,
    WEIGHT              NUMBER(5,2)           not null,
@@ -412,24 +412,3 @@ BEGIN
   FROM   dual;
 END;
 /
-
-/*==============================================================*/
-/* Create Views                                                 */
-/*==============================================================*/
-
-CREATE VIEW GetAirlines AS
-SELECT ID,NAME,COUNTRY,LOGO_URL,ACTIVE
-FROM airline;
-
-CREATE VIEW GetAirports AS
-SELECT * FROM Airport;
-
-CREATE VIEW GetFlights AS
-SELECT * FROM flight;
-
-CREATE VIEW GetFlightStatuses AS
-SELECT ID,NAME,DESCRIPTION
-FROM flight_status;
-
-CREATE VIEW GetMaintenanceLog AS
-SELECT * FROM maintenance_log;
