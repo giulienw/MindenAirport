@@ -21,11 +21,12 @@ func (db Database) GetTicketByID(id string) models.Ticket {
 	if cursor.Next() {
 		err := cursor.Scan(&ticket.ID, &ticket.SeatNumber, &ticket.From, &ticket.To, &ticket.BookingDate, &ticket.DepartureTime, &ticket.TravelClass, &ticket.Price, &ticket.Gate, &ticket.BaggageClaim, &ticket.Status)
 		if err != nil {
-			log.Fatal("Error scanning ticket data:", err)
+			log.Println("Error scanning ticket data:", err)
+			return models.Ticket{}, err
 		}
 	}
 
-	return ticket
+	return ticket, nil
 }
 
 // GetTicketsByUserID retrieves all tickets for a specific user
