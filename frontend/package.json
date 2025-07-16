@@ -11,9 +11,7 @@
     "preview": "vite preview",
     "build:web": "tsc -b && vite build",
     "build:electron": "tsc -b && vite build && electron-builder",
-    "electron": "electron .",
-    "dev": "vite --mode electron",
-    "start:electron": "npm run build:web && electron ."
+    "dev": "vite --mode electron"
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.1.8",
