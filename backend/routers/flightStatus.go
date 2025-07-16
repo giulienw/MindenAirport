@@ -22,8 +22,8 @@ func GetFlightStatusByID(db database.Database) gin.HandlerFunc {
 	fn := func(c *gin.Context) {
 		id, err := strconv.Atoi(c.Param("id"))
 		if err != nil {
-			// ... handle error
-			panic(err)
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid ID format"})
+			return
 		}
 		c.IndentedJSON(http.StatusOK, db.GetFlightStatusByID(id))
 	}
