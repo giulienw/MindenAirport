@@ -609,17 +609,7 @@ BEGIN
 END;
 /
 
--- Fix GetAirportByID to use correct column mapping
-CREATE OR REPLACE PROCEDURE GetAirportByIDFixed (
-   airport_id VARCHAR2,
-   result_cursor OUT SYS_REFCURSOR
-)
-AS
-BEGIN
-   OPEN result_cursor FOR
-   SELECT ID, NAME, COUNTRY, CITY, TIMEZONE, ELEVATION, NUMBER_OF_TERMINALS, LATITUDE, LONGITUDE FROM AIRPORT WHERE ID = airport_id;
-END;
-/
+-- Removed duplicate procedure GetAirportByIDFixed. Ensure the corrected logic is applied to GetAirportByID.
 
 -- Fix GetFlightByID to use correct column mapping
 CREATE OR REPLACE PROCEDURE GetFlightByIDFixed (
