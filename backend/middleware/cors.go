@@ -11,7 +11,12 @@ import (
 func CORSMiddleware() gin.HandlerFunc {
 	// Get allowed origins from environment variable if set
 	allowedOrigins := []string{
-		"http://127.0.0.1:8080", // Allow all origins in development
+		"http://localhost:3000",     // Frontend in Docker
+		"http://127.0.0.1:3000",     // Frontend alternative
+		"http://localhost:5173",     // Frontend dev server
+		"http://127.0.0.1:5173",     // Frontend dev server alternative
+		"http://localhost:8080",     // Backend self
+		"http://127.0.0.1:8080",     // Backend self alternative
 	}
 
 	config := cors.Config{

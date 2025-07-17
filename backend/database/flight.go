@@ -8,22 +8,31 @@ import (
 )
 
 func (db Database) GetFlightByID(id string) (models.Flight, error) {
-	query := `BEGIN GetFlightByID(:1, :2); END;`
-
-	var cursor *sql.Rows
-	_, err := db.Exec(query, id, sql.Out{Dest: &cursor})
-	if err != nil {
-		log.Fatal("Error calling stored procedure:", err)
-	}
-	defer cursor.Close()
+	query := `SELECT ID, "FROM", "TO", PILOT, PLANE, TERMINAL, STATUS, SCHEDULED_DEPARTURE, ACTUAL_DEPARTURE, SCHEDULED_ARRIVAL, ACTUAL_ARRIVAL, GATE, BAGGAGE_CLAIM FROM FLIGHT WHERE ID = :1`
 
 	var flight models.Flight
-
-	if cursor.Next() {
-		err := cursor.Scan(&flight.ID, &flight.From, &flight.To, &flight.PilotID, &flight.PlaneID, &flight.TerminalID, &flight.StatusID, &flight.ScheduledDeparture, &flight.ActualDeparture, &flight.ScheduledArrival, &flight.ActualArrival, &flight.Gate, &flight.BaggageClaim)
-		if err != nil {
-			return models.Flight{}, fmt.Errorf("error scanning flight data: %w", err)
+	row := db.QueryRow(query, id)
+	
+	err := row.Scan(
+		&flight.ID, 
+		&flight.From, 
+		&flight.To, 
+		&flight.PilotID, 
+		&flight.PlaneID, 
+		&flight.TerminalID, 
+		&flight.StatusID, 
+		&flight.ScheduledDeparture, 
+		&flight.ActualDeparture, 
+		&flight.ScheduledArrival, 
+		&flight.ActualArrival, 
+		&flight.Gate, 
+		&flight.BaggageClaim,
+	)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return models.Flight{}, fmt.Errorf("flight with ID %s not found", id)
 		}
+		return models.Flight{}, fmt.Errorf("error scanning flight data: %w", err)
 	}
 
 	return flight, nil
@@ -54,28 +63,33 @@ func (db Database) GetAllFlights(page, limit int) ([]models.Flight, int, error) 
 	var flightList []models.Flight
 	var total int
 
-	// First get the total count using stored procedure
-	countQuery := `BEGIN GetFlightCount(:1); END;`
-	_, err := db.Exec(countQuery, sql.Out{Dest: &total})
+	// First get the total count
+	countQuery := `SELECT COUNT(*) FROM FLIGHT`
+	err := db.QueryRow(countQuery).Scan(&total)
 	if err != nil {
-		return nil, 0, err
+		return nil, 0, fmt.Errorf("error getting flight count: %w", err)
 	}
 
 	// Calculate offset
 	offset := (page - 1) * limit
 
-	// Get flights with pagination using stored procedure
-	query := `BEGIN GetAllFlights(:1, :2, :3); END;`
-	var cursor *sql.Rows
-	_, err = db.Exec(query, offset, limit, sql.Out{Dest: &cursor})
+	// Get flights with pagination
+	query := `SELECT ID, "FROM", "TO", PILOT, PLANE, TERMINAL, STATUS, SCHEDULED_DEPARTURE, ACTUAL_DEPARTURE, SCHEDULED_ARRIVAL, ACTUAL_ARRIVAL, GATE, BAGGAGE_CLAIM 
+	          FROM (
+	              SELECT ROW_NUMBER() OVER (ORDER BY ID) as rn, ID, "FROM", "TO", PILOT, PLANE, TERMINAL, STATUS, SCHEDULED_DEPARTURE, ACTUAL_DEPARTURE, SCHEDULED_ARRIVAL, ACTUAL_ARRIVAL, GATE, BAGGAGE_CLAIM 
+	              FROM FLIGHT
+	          ) 
+	          WHERE rn > :1 AND rn <= :2`
+	
+	rows, err := db.Query(query, offset, offset+limit)
 	if err != nil {
-		return nil, 0, err
+		return nil, 0, fmt.Errorf("error querying flights: %w", err)
 	}
-	defer cursor.Close()
+	defer rows.Close()
 
-	for cursor.Next() {
+	for rows.Next() {
 		var flight models.Flight
-		err := cursor.Scan(
+		err := rows.Scan(
 			&flight.ID,
 			&flight.From,
 			&flight.To,
@@ -91,13 +105,17 @@ func (db Database) GetAllFlights(page, limit int) ([]models.Flight, int, error) 
 			&flight.BaggageClaim,
 		)
 		if err != nil {
-			return nil, 0, err
+			return nil, 0, fmt.Errorf("error scanning flight: %w", err)
 		}
 		flightList = append(flightList, flight)
 	}
 
-	if err = cursor.Err(); err != nil {
-		return nil, 0, err
+	if err = rows.Err(); err != nil {
+		return nil, 0, fmt.Errorf("error iterating flight rows: %w", err)
+	}
+
+	return flightList, total, nil
+}
 	}
 
 	return flightList, total, nil

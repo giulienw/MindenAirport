@@ -9,13 +9,15 @@
   "scripts": {
     "lint": "eslint .",
     "preview": "vite preview",
-    "build:web": "tsc -b && vite build",
+    "build:web": "tsc --project tsconfig.web.json && vite build",
+    "build:web-docker": "vite build",
     "build:electron": "tsc -b && vite build && electron-builder",
     "dev": "vite --mode electron"
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.1.8",
     "clsx": "^2.1.1",
+    "frontend": ".",
     "lucide-react": "^0.514.0",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",

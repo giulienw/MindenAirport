@@ -9,10 +9,6 @@ import (
 	"mindenairport/initializers"
 	"mindenairport/middleware"
 	"mindenairport/routers"
-
-	"time"
-
-	"github.com/gin-contrib/cors"
 )
 
 var db database.Database
@@ -25,17 +21,17 @@ func init() {
 func main() {
 	router := gin.Default()
 
-	// Configure CORS - use simple CORS middleware for better compatibility
-	router.Use(cors.New(cors.Config{
-		AllowOrigins:     []string{"*"},
-		AllowMethods:     []string{"PUT", "PATCH", "GET", "POST", "DELETE"},
-		AllowHeaders:     []string{"Origin", "Authorization", "Content-Type"},
-		ExposeHeaders:    []string{"Content-Length"},
-		AllowCredentials: true,
-		MaxAge:           12 * time.Hour,
-	}))
+	// Configure CORS - use custom CORS middleware for proper frontend access
+	
 
 	apiRouter := router.Group("/api")
+
+	apiRouter.Use(middleware.CORSMiddleware())
+
+	// Health check endpoint
+	apiRouter.HEAD("/health", func(c *gin.Context) {
+		c.JSON(200, gin.H{"status": "healthy", "message": "MindenAirport API is running"})
+	})
 
 	// Authentication routes (public)
 	routers.AuthRoutes(apiRouter.Group("/auth"), db)
@@ -68,5 +64,5 @@ func main() {
 	authProtected.GET("/dashboard", routers.GetDashboard(db))
 	authProtected.POST("/refresh", routers.RefreshToken(db))
 
-	router.Run("localhost:8080")
+	router.Run(":8080")
 }
