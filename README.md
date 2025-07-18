@@ -73,16 +73,6 @@ MindenAirport/
    cd frontend
    ```
 
-2. Copy the environment template:
-   ```bash
-   cp .env.template .env
-   ```
-
-3. Edit `.env` file:
-   ```bash
-   VITE_API_BASE_URL=http://localhost:8080
-   ```
-
 ## 🔧 Backend Setup
 
 1. **Navigate to backend directory:**
