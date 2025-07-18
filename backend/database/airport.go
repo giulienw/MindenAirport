@@ -2,69 +2,96 @@ package database
 
 import (
 	"database/sql"
+	"database/sql/driver"
 	"log"
 	"mindenairport/models"
+	"strconv"
+
+	"github.com/godror/godror"
 )
 
 func (db Database) GetAirports() []models.Airport {
-	query := `BEGIN GetAllAirports(:1); END;`
-
-	var cursor *sql.Rows
-	_, err := db.Exec(query, sql.Out{Dest: &cursor})
+	var query = `
+	BEGIN 
+		GetAllAirports(:1); 
+	END;
+	`
+	stmt, err := db.Prepare(query)
 	if err != nil {
 		log.Printf("Error calling stored procedure: %v", err)
 		return []models.Airport{}
 	}
 
-	if cursor == nil {
-		log.Printf("Cursor is nil after stored procedure call")
+	var cursor driver.Rows
+	_, err = stmt.Exec(sql.Out{Dest: &cursor})
+	if err != nil {
+		log.Printf("Failed to execute prepared statement: %v", err)
 		return []models.Airport{}
 	}
+
+	r := make([]driver.Value, len(cursor.Columns()))
+	err = cursor.Next(r)
+	if err != nil {
+		log.Println(err) // column count mismatch: we have 10 columns, but given 0 destination
+	}
+
 	defer cursor.Close()
 
 	var airports []models.Airport
 
-	for cursor.Next() {
-		var airport models.Airport
-		err := cursor.Scan(&airport.ID, &airport.Name, &airport.Country, &airport.City, &airport.Timezone, &airport.Elevation, &airport.NumberOfTerminal, &airport.Latitude, &airport.Longitude)
+	for {
+		err := cursor.Next(r)
 		if err != nil {
-			log.Printf("Error scanning airport data: %v", err)
-			continue
+			break
 		}
+		var airport models.Airport
+		airport.ID = r[0].(string)
+		airport.Name = r[1].(string)
+		airport.Country = r[2].(string)
+		airport.City = r[3].(string)
+		airport.Timezone = r[4].(string)
+		airport.Elevation, _ = strconv.ParseFloat(r[5].(godror.Number).String(), 64)
+		airport.Latitude, _ = strconv.ParseFloat(r[7].(godror.Number).String(), 64)
+		airport.Longitude, _ = strconv.ParseFloat(r[8].(godror.Number).String(), 64)
 		airports = append(airports, airport)
-	}
-
-	if err = cursor.Err(); err != nil {
-		log.Printf("Cursor error: %v", err)
 	}
 
 	return airports
 }
 
 func (db Database) GetAirportByID(id string) models.Airport {
-	query := `BEGIN GetAirportByID(:1, :2); END;`
-
-	var cursor *sql.Rows
-	_, err := db.Exec(query, id, sql.Out{Dest: &cursor})
+	stmt, err := db.Prepare(`
+	BEGIN 
+	GetAirportByID(:1, :2); END;
+	`)
 	if err != nil {
-		log.Printf("Error calling stored procedure: %v", err)
+		log.Printf("Error preparing statement: %v", err)
 		return models.Airport{}
 	}
 
-	if cursor == nil {
-		log.Printf("Cursor is nil after stored procedure call")
+	var cursor driver.Rows
+	_, err = stmt.Exec(id, sql.Out{Dest: &cursor})
+	if err != nil {
+		log.Printf("Failed to execute prepared statement: %v", err)
 		return models.Airport{}
 	}
+
+	r := make([]driver.Value, len(cursor.Columns()))
 	defer cursor.Close()
 
 	var airport models.Airport
 
-	if cursor.Next() {
-		err := cursor.Scan(&airport.ID, &airport.Name, &airport.Country, &airport.City, &airport.Timezone, &airport.Elevation, &airport.NumberOfTerminal, &airport.Latitude, &airport.Longitude)
-		if err != nil {
-			log.Printf("Error scanning airport data: %v", err)
-			return models.Airport{}
-		}
+	err = cursor.Next(r)
+	if err == nil {
+		airport.ID = r[0].(string)
+		airport.Name = r[1].(string)
+		airport.Country = r[2].(string)
+		airport.City = r[3].(string)
+		airport.Timezone = r[4].(string)
+		airport.Elevation, _ = strconv.ParseFloat(r[5].(godror.Number).String(), 64)
+		airport.NumberOfTerminal, _ = strconv.Atoi(r[6].(godror.Number).String())
+		airport.Latitude, _ = strconv.ParseFloat(r[7].(godror.Number).String(), 64)
+		airport.Longitude, _ = strconv.ParseFloat(r[8].(godror.Number).String(), 64)
 	}
 
 	return airport

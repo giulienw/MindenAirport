@@ -3,6 +3,7 @@ package routers
 import (
 	"net/http"
 	"strings"
+	"time"
 
 	"mindenairport/database"
 	"mindenairport/models"
@@ -50,6 +51,7 @@ func Register(db database.Database) gin.HandlerFunc {
 			return
 		}
 
+		c.SetCookie("token", token, int(expiresAt.Sub(time.Now()).Seconds()), "/", "", false, true)
 		// Return success response
 		response := models.AuthResponse{
 			Token:     token,
@@ -114,6 +116,8 @@ func Login(db database.Database) gin.HandlerFunc {
 			return
 		}
 
+		c.SetCookie("token", token, int(expiresAt.Sub(time.Now()).Seconds()), "/", "", false, false)
+
 		// Return success response
 		response := models.AuthResponse{
 			Token:     token,
@@ -159,6 +163,7 @@ func GetProfile(db database.Database) gin.HandlerFunc {
 // Logout handles user logout (mainly for client-side token removal)
 func Logout() gin.HandlerFunc {
 	return func(c *gin.Context) {
+		c.SetCookie("token", "", -1, "/", "", false, true)
 		c.JSON(http.StatusOK, gin.H{
 			"message": "Logout successful",
 		})

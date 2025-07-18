@@ -2,6 +2,7 @@ package database
 
 import (
 	"database/sql"
+	"database/sql/driver"
 	"log"
 	"mindenairport/models"
 )
@@ -9,27 +10,40 @@ import (
 func (db Database) GetAirlineByID(id string) models.Airline {
 	query := `BEGIN GetAirlineByID(:1, :2); END;`
 
-	var cursor *sql.Rows
-	_, err := db.Exec(query, id, sql.Out{Dest: &cursor})
+	stmt, err := db.Prepare(query)
 	if err != nil {
 		log.Printf("Error calling stored procedure: %v", err)
 		return models.Airline{}
 	}
 
-	if cursor == nil {
-		log.Printf("Cursor is nil after stored procedure call")
+	var cursor driver.Rows
+	_, err = stmt.Exec(sql.Out{Dest: &cursor})
+	if err != nil {
+		log.Printf("Failed to execute prepared statement: %v", err)
 		return models.Airline{}
 	}
+
+	r := make([]driver.Value, len(cursor.Columns()))
+	err = cursor.Next(r)
+	if err != nil {
+		log.Println(err)
+	}
+
 	defer cursor.Close()
 
 	var airline models.Airline
 
-	if cursor.Next() {
-		err := cursor.Scan(&airline.ID, &airline.Name, &airline.Country, &airline.Logo, &airline.Active)
+	for {
+		err := cursor.Next(r)
 		if err != nil {
-			log.Printf("Error scanning airline data: %v", err)
-			return models.Airline{}
+			break
 		}
+		var airline models.Airline
+		airline.ID = r[0].(string)
+		airline.Name = r[1].(string)
+		airline.Country = r[2].(string)
+		airline.Logo = r[3].(string)
+		airline.Active = r[4].(int64) == 1
 	}
 
 	return airline
@@ -38,33 +52,41 @@ func (db Database) GetAirlineByID(id string) models.Airline {
 func (db Database) GetAirlines() []models.Airline {
 	query := `BEGIN GetAllAirlines(:1); END;`
 
-	var cursor *sql.Rows
-	_, err := db.Exec(query, sql.Out{Dest: &cursor})
+	stmt, err := db.Prepare(query)
 	if err != nil {
 		log.Printf("Error calling stored procedure: %v", err)
 		return []models.Airline{}
 	}
 
-	if cursor == nil {
-		log.Printf("Cursor is nil after stored procedure call")
+	var cursor driver.Rows
+	_, err = stmt.Exec(sql.Out{Dest: &cursor})
+	if err != nil {
+		log.Printf("Failed to execute prepared statement: %v", err)
 		return []models.Airline{}
 	}
+
+	r := make([]driver.Value, len(cursor.Columns()))
+	err = cursor.Next(r)
+	if err != nil {
+		log.Println(err)
+	}
+
 	defer cursor.Close()
 
 	var airlines []models.Airline
 
-	for cursor.Next() {
-		var airline models.Airline
-		err := cursor.Scan(&airline.ID, &airline.Name, &airline.Country, &airline.Logo, &airline.Active)
+	for {
+		err := cursor.Next(r)
 		if err != nil {
-			log.Printf("Error scanning airline data: %v", err)
-			continue
+			break
 		}
+		var airline models.Airline
+		airline.ID = r[0].(string)
+		airline.Name = r[1].(string)
+		airline.Country = r[2].(string)
+		airline.Logo = r[3].(string)
+		airline.Active = r[4].(int64) == 1
 		airlines = append(airlines, airline)
-	}
-
-	if err = cursor.Err(); err != nil {
-		log.Printf("Cursor error: %v", err)
 	}
 
 	return airlines

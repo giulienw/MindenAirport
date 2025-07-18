@@ -30,3 +30,8 @@ export const getFlightStatusColor = (status?: string) => {
       return 'text-gray-600 bg-gray-100';
   }
 };
+
+export function getCookie(key: string) {
+  const b = document.cookie.match("(^|;)\\s*" + key + "\\s*=\\s*([^;]+)");
+  return b ? b.pop() : "";
+}

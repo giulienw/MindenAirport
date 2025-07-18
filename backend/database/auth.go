@@ -2,6 +2,7 @@ package database
 
 import (
 	"database/sql"
+	"database/sql/driver"
 	"fmt"
 	"log"
 	"mindenairport/models"
@@ -13,36 +14,38 @@ import (
 
 // GetUserByEmail retrieves a user by email
 func (db Database) GetUserByEmail(email string) (*models.AirportUser, error) {
-	query := `BEGIN GetUserByEmail(:1, :2); END;`
-
-	var cursor *sql.Rows
-	_, err := db.Exec(query, email, sql.Out{Dest: &cursor})
+	stmt, err := db.Prepare(`
+	BEGIN 
+	GetUserByEmail(:1, :2); END;
+	`)
 	if err != nil {
 		return nil, err
 	}
+
+	var cursor driver.Rows
+	_, err = stmt.Exec(email, sql.Out{Dest: &cursor})
+	if err != nil {
+		return nil, err
+	}
+
+	r := make([]driver.Value, len(cursor.Columns()))
 	defer cursor.Close()
 
 	var user models.AirportUser
-	var active int
 
-	if cursor.Next() {
-		err := cursor.Scan(
-			&user.ID,
-			&user.FirstName,
-			&user.LastName,
-			&user.Birthdate,
-			&user.Password,
-			&active,
-			&user.Email,
-			&user.Phone,
-			&user.Role,
-		)
-		if err != nil {
-			return nil, err
+	err = cursor.Next(r)
+	if err == nil {
+		user.ID = r[0].(string)
+		user.FirstName = r[1].(string)
+		user.LastName = r[2].(string)
+		if r[3] != nil {
+			user.Birthdate = r[3].(time.Time)
 		}
-
-		// Convert active int to bool
-		user.Active = active == 1
+		user.Password = r[4].(string)
+		user.Active = r[5].(int64) == 1
+		user.Email = r[6].(string)
+		user.Phone = r[7].(string)
+		user.Role = r[8].(string)
 		return &user, nil
 	}
 
@@ -51,36 +54,38 @@ func (db Database) GetUserByEmail(email string) (*models.AirportUser, error) {
 
 // GetUserByID retrieves a user by ID
 func (db Database) GetUserByID(id string) (*models.AirportUser, error) {
-	query := `BEGIN GetUserByID(:1, :2); END;`
-
-	var cursor *sql.Rows
-	_, err := db.Exec(query, id, sql.Out{Dest: &cursor})
+	stmt, err := db.Prepare(`
+	BEGIN 
+	GetUserByID(:1, :2); END;
+	`)
 	if err != nil {
 		return nil, err
 	}
+
+	var cursor driver.Rows
+	_, err = stmt.Exec(id, sql.Out{Dest: &cursor})
+	if err != nil {
+		return nil, err
+	}
+
+	r := make([]driver.Value, len(cursor.Columns()))
 	defer cursor.Close()
 
 	var user models.AirportUser
-	var active int
 
-	if cursor.Next() {
-		err := cursor.Scan(
-			&user.ID,
-			&user.FirstName,
-			&user.LastName,
-			&user.Birthdate,
-			&user.Password,
-			&active,
-			&user.Email,
-			&user.Phone,
-			&user.Role,
-		)
-		if err != nil {
-			return nil, err
+	err = cursor.Next(r)
+	if err == nil {
+		user.ID = r[0].(string)
+		user.FirstName = r[1].(string)
+		user.LastName = r[2].(string)
+		if r[3] != nil {
+			user.Birthdate = r[3].(time.Time)
 		}
-
-		// Convert active int to bool
-		user.Active = active == 1
+		user.Password = r[4].(string)
+		user.Active = r[5].(int64) == 1
+		user.Email = r[6].(string)
+		user.Phone = r[7].(string)
+		user.Role = r[8].(string)
 		return &user, nil
 	}
 
@@ -150,8 +155,11 @@ func (db Database) DeactivateUser(userID string, active int) error {
 // CheckEmailExists checks if an email already exists in the database
 func (db Database) CheckEmailExists(email string) (bool, error) {
 	var exists int
-	query := `BEGIN UserExistsByEmail(:1, :2); END;`
-	_, err := db.Exec(query, email, sql.Out{Dest: &exists})
+	stmt, err := db.Prepare(`BEGIN UserExistsByEmail(:1, :2); END;`)
+	if err != nil {
+		return false, err
+	}
+	_, err = stmt.Exec(email, sql.Out{Dest: &exists})
 	if err != nil {
 		return false, err
 	}
@@ -164,8 +172,11 @@ func (db Database) GetAllUsers(page, limit int) ([]models.AirportUser, int, erro
 	var total int
 
 	// First get the total count using stored procedure
-	countQuery := `BEGIN GetUserCount(:1); END;`
-	_, err := db.Exec(countQuery, sql.Out{Dest: &total})
+	countStmt, err := db.Prepare(`BEGIN GetUserCount(:1); END;`)
+	if err != nil {
+		return nil, 0, err
+	}
+	_, err = countStmt.Exec(sql.Out{Dest: &total})
 	if err != nil {
 		return nil, 0, err
 	}
@@ -174,39 +185,41 @@ func (db Database) GetAllUsers(page, limit int) ([]models.AirportUser, int, erro
 	offset := (page - 1) * limit
 
 	// Get users with pagination using stored procedure
-	query := `BEGIN GetAllUsers(:1, :2, :3); END;`
-	var cursor *sql.Rows
-	_, err = db.Exec(query, offset, limit, sql.Out{Dest: &cursor})
+	stmt, err := db.Prepare(`
+	BEGIN 
+	GetAllUsers(:1, :2, :3); END;
+	`)
 	if err != nil {
 		return nil, 0, err
 	}
-	defer cursor.Close()
 
-	for cursor.Next() {
-		var user models.AirportUser
-		var active int
-		err := cursor.Scan(
-			&user.ID,
-			&user.FirstName,
-			&user.LastName,
-			&user.Birthdate,
-			&user.Password,
-			&active,
-			&user.Email,
-			&user.Phone,
-			&user.Role,
-		)
-		if err != nil {
-			return nil, 0, err
-		}
-
-		// Convert active int to bool
-		user.Active = active == 1
-		users = append(users, user)
+	var cursor driver.Rows
+	_, err = stmt.Exec(offset, limit, sql.Out{Dest: &cursor})
+	if err != nil {
+		return nil, 0, err
 	}
 
-	if err = cursor.Err(); err != nil {
-		return nil, 0, err
+	r := make([]driver.Value, len(cursor.Columns()))
+	defer cursor.Close()
+
+	for {
+		err := cursor.Next(r)
+		if err != nil {
+			break
+		}
+		var user models.AirportUser
+		user.ID = r[0].(string)
+		user.FirstName = r[1].(string)
+		user.LastName = r[2].(string)
+		if r[3] != nil {
+			user.Birthdate = r[3].(time.Time)
+		}
+		user.Password = r[4].(string)
+		user.Active = r[5].(int64) == 1
+		user.Email = r[6].(string)
+		user.Phone = r[7].(string)
+		user.Role = r[8].(string)
+		users = append(users, user)
 	}
 
 	return users, total, nil
@@ -227,8 +240,12 @@ func (db Database) UpdateUserByAdmin(userID, firstName, lastName, email, phone s
 
 func (db Database) GetUserCount() int {
 	var count int
-	query := `BEGIN GetUserCount(:1); END;`
-	_, err := db.Exec(query, sql.Out{Dest: &count})
+	stmt, err := db.Prepare(`BEGIN GetUserCount(:1); END;`)
+	if err != nil {
+		log.Printf("Error preparing statement: %v", err)
+		return 0
+	}
+	_, err = stmt.Exec(sql.Out{Dest: &count})
 	if err != nil {
 		log.Printf("Error getting user count: %v", err)
 		return 0

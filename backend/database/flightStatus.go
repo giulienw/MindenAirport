@@ -2,27 +2,44 @@ package database
 
 import (
 	"database/sql"
+	"database/sql/driver"
 	"log"
 	"mindenairport/models"
+	"strconv"
+
+	"github.com/godror/godror"
 )
 
 func (db Database) GetFlightStatuses() []models.FlightStatus {
-	query := `BEGIN GetFlightStatuses(:1); END;`
-
-	var cursor *sql.Rows
-	_, err := db.Exec(query, sql.Out{Dest: &cursor})
+	stmt, err := db.Prepare(`
+	BEGIN 
+	GetFlightStatuses(:1); END;
+	`)
 	if err != nil {
-		log.Fatal("Error calling stored procedure:", err)
+		log.Fatal("Error preparing statement:", err)
 	}
+
+	var cursor driver.Rows
+	_, err = stmt.Exec(sql.Out{Dest: &cursor})
+	if err != nil {
+		log.Fatal("Failed to execute prepared statement:", err)
+	}
+
+	r := make([]driver.Value, len(cursor.Columns()))
 	defer cursor.Close()
 
 	var flightStatuses []models.FlightStatus
 
-	for cursor.Next() {
-		var flightStatus models.FlightStatus
-		err := cursor.Scan(&flightStatus.ID, &flightStatus.Name, &flightStatus.Description)
+	for {
+		err := cursor.Next(r)
 		if err != nil {
-			log.Fatal("Error scanning flight status data:", err)
+			break
+		}
+		var flightStatus models.FlightStatus
+		flightStatus.ID, _ = strconv.Atoi(r[0].(godror.Number).String())
+		flightStatus.Name = r[1].(string)
+		if r[2] != nil {
+			flightStatus.Description = r[2].(string)
 		}
 		flightStatuses = append(flightStatuses, flightStatus)
 	}
@@ -31,21 +48,31 @@ func (db Database) GetFlightStatuses() []models.FlightStatus {
 }
 
 func (db Database) GetFlightStatusByID(id int) models.FlightStatus {
-	query := `BEGIN GetFlightStatusByID(:1, :2); END;`
-
-	var cursor *sql.Rows
-	_, err := db.Exec(query, id, sql.Out{Dest: &cursor})
+	stmt, err := db.Prepare(`
+	BEGIN 
+	GetFlightStatusByID(:1, :2); END;
+	`)
 	if err != nil {
-		log.Fatal("Error calling stored procedure:", err)
+		log.Fatal("Error preparing statement:", err)
 	}
+
+	var cursor driver.Rows
+	_, err = stmt.Exec(id, sql.Out{Dest: &cursor})
+	if err != nil {
+		log.Fatal("Failed to execute prepared statement:", err)
+	}
+
+	r := make([]driver.Value, len(cursor.Columns()))
 	defer cursor.Close()
 
 	var flightStatus models.FlightStatus
 
-	if cursor.Next() {
-		err := cursor.Scan(&flightStatus.ID, &flightStatus.Name, &flightStatus.Description)
-		if err != nil {
-			log.Fatal("Error scanning flight status data:", err)
+	err = cursor.Next(r)
+	if err == nil {
+		flightStatus.ID, _ = strconv.Atoi(r[0].(godror.Number).String())
+		flightStatus.Name = r[1].(string)
+		if r[2] != nil {
+			flightStatus.Description = r[2].(string)
 		}
 	}
 

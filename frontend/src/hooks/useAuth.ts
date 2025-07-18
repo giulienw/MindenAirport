@@ -29,7 +29,7 @@ export function useAuth() {
   useEffect(() => {
     const initAuth = async () => {
       // Check if user is already logged in
-      const token = localStorage.getItem('token');
+      const token = authService.getToken();
       const currentUser = authService.getCurrentUser();
       
       console.log('Auth check:', { token: !!token, currentUser: !!currentUser });

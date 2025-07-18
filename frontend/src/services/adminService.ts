@@ -9,7 +9,7 @@ import { flightService } from "./flightService";
 
 export const adminService = {
   async getAdminDashboard(): Promise<AdminDashboard> {
-    const token = localStorage.getItem("token");
+    const token = authService.getToken();
     if (!token) {
       throw new Error("No authentication token found");
     }
@@ -48,7 +48,7 @@ export const adminService = {
     limit = 20,
     search?: string
   ): Promise<{ users: User[]; total: number }> {
-    const token = localStorage.getItem("token");
+    const token = authService.getToken();
     if (!token) {
       throw new Error("No authentication token found");
     }
@@ -81,7 +81,7 @@ export const adminService = {
   },
 
   async updateUserStatus(userId: string, active: boolean): Promise<void> {
-    const token = localStorage.getItem("token");
+    const token = authService.getToken();
     if (!token) {
       throw new Error("No authentication token found");
     }
@@ -108,7 +108,7 @@ export const adminService = {
   },
 
   async getFlightManagement(): Promise<FlightManagement[]> {
-    const token = localStorage.getItem("token");
+    const token = authService.getToken();
     if (!token) {
       throw new Error("No authentication token found");
     }
@@ -137,7 +137,7 @@ export const adminService = {
   },
 
   async updateFlightStatus(flightId: string, status: number): Promise<void> {
-    const token = localStorage.getItem("token");
+    const token = authService.getToken();
     if (!token) {
       throw new Error("No authentication token found");
     }
@@ -170,7 +170,7 @@ export const adminService = {
   },
 
   async getBaggageManagement(): Promise<BaggageManagement[]> {
-    const token = localStorage.getItem("token");
+    const token = authService.getToken();
     if (!token) {
       throw new Error("No authentication token found");
     }
@@ -199,7 +199,7 @@ export const adminService = {
   },
 
   async resolveAlert(alertId: string): Promise<void> {
-    const token = localStorage.getItem("token");
+    const token = authService.getToken();
     if (!token) {
       throw new Error("No authentication token found");
     }
