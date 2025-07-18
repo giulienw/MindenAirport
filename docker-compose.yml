@@ -8,7 +8,7 @@ services:
       dockerfile: Dockerfile
     container_name: minden_backend
     environment:
-      - CONNECTIONSTRING=MindenAirport/AbuHatem@ORCL
+      - CONNECTIONSTRING=username/password@ORCL
       - JWT_SECRET=your_jwt_secret_here_change_in_production
       - GIN_MODE=release
     ports:

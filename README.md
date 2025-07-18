@@ -73,16 +73,6 @@ MindenAirport/
    cd frontend
    ```
 
-2. Copy the environment template:
-   ```bash
-   cp .env.template .env
-   ```
-
-3. Edit `.env` file:
-   ```bash
-   VITE_API_BASE_URL=http://localhost:8080
-   ```
-
 ## 🔧 Backend Setup
 
 1. **Navigate to backend directory:**
@@ -260,9 +250,6 @@ The Docker setup uses the following environment variables:
 **Backend:**
 - `CONNECTIONSTRING=your_username/your_password@ORCL`
 - `JWT_SECRET=your_jwt_secret_here_change_in_production`
-
-**Frontend:**
-- `VITE_API_BASE_URL=http://localhost:8080`
 
 ### Docker Troubleshooting
 
