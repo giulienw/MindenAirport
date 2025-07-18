@@ -209,7 +209,6 @@ The project includes Docker configurations for deployment. The backend uses the 
 ### Prerequisites for Docker Setup
 
 - **Docker Desktop** - [Download Docker Desktop](https://www.docker.com/products/docker-desktop/)
-- **Access to Oracle Database** - The application connects to `rs03-db-inf-min.ad.fh-bielefeld.de`
 - **Database credentials** - Username and password for the Oracle database
 
 ### Quick Start with Docker
@@ -328,6 +327,4 @@ bun run build:electron
    - If frontend build fails with lockfile errors, the dependencies will be resolved automatically
 
 6. **Database Connection:**
-   - Ensure network access to `rs03-db-inf-min.ad.fh-bielefeld.de:1521`
-   - Verify your Oracle database username and password
-   - Check that the tnsnames.ora configuration is correct
+   - Ensure to in HSBI network via Cisco VPN
