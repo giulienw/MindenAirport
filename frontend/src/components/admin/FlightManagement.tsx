@@ -1,3 +1,23 @@
+/**
+ * FlightManagement Component
+ * 
+ * Administrative interface for managing flight operations including viewing,
+ * updating, and monitoring all flights in the system. Provides comprehensive
+ * flight management capabilities for airport administrators.
+ * 
+ * Features:
+ * - Real-time flight data display with enriched information
+ * - Flight status update functionality with modal interface
+ * - Comprehensive flight details (route, times, gate, terminal)
+ * - Error handling and loading states
+ * - Responsive grid layout for multiple flights
+ * - Status-based visual indicators and color coding
+ * 
+ * Access: Requires admin authentication and appropriate permissions
+ * 
+ * @returns JSX element containing the flight management interface
+ */
+
 import React, { useState, useEffect } from 'react';
 import { Plane, Clock, MapPin, Users, AlertTriangle } from 'lucide-react';
 import type { FlightManagement as FlightManagementType } from '@/types';
@@ -5,16 +25,26 @@ import { adminService, flightService } from '@/services';
 import { getFlightType, getFlightStatusColor as getStatusColor } from '@/lib/utils';
 
 export const FlightManagement: React.FC = () => {
+  // Flight management data state
   const [flights, setFlights] = useState<FlightManagementType[]>([]);
+  // Loading state for UI feedback
   const [loading, setLoading] = useState(true);
+  // Error state for error handling and display
   const [error, setError] = useState<string | null>(null);
+  // Selected flight for status update operations
   const [selectedFlight, setSelectedFlight] = useState<FlightManagementType | null>(null);
+  // Modal visibility state for status updates
   const [showStatusModal, setShowStatusModal] = useState(false);
 
+  // Fetch flight data on component mount
   useEffect(() => {
     fetchFlights();
   }, []);
 
+  /**
+   * Fetches flight management data from the service layer
+   * Handles loading states and error management
+   */
   const fetchFlights = async () => {
     try {
       setLoading(true);
@@ -28,6 +58,12 @@ export const FlightManagement: React.FC = () => {
     }
   };
 
+  /**
+   * Updates flight status through the admin service
+   * 
+   * @param flightId - ID of the flight to update
+   * @param newStatus - New status ID to assign to the flight
+   */
   const handleUpdateStatus = async (flightId: string, newStatus: string) => {
     try {
       await adminService.updateFlightStatus(flightId, Number(newStatus));
@@ -39,6 +75,12 @@ export const FlightManagement: React.FC = () => {
     }
   };
 
+  /**
+   * Returns appropriate icon component based on flight status
+   * 
+   * @param status - Flight status string
+   * @returns Lucide icon component for the status
+   */
   const getStatusIcon = (status: string) => {
     switch (status.toLowerCase()) {
       case 'delayed':
@@ -54,6 +96,12 @@ export const FlightManagement: React.FC = () => {
     }
   };
 
+  /**
+   * Formats time string for display in user-friendly format
+   * 
+   * @param dateString - ISO date string to format
+   * @returns Formatted time string (HH:MM AM/PM)
+   */
   const formatTime = (dateString: string) => {
     return new Date(dateString).toLocaleTimeString('en-US', {
       hour: '2-digit',
@@ -61,6 +109,12 @@ export const FlightManagement: React.FC = () => {
     });
   };
 
+  /**
+   * Formats date string for display in user-friendly format
+   * 
+   * @param dateString - ISO date string to format
+   * @returns Formatted date string (MM/DD/YYYY)
+   */
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('en-US', {
       month: 'short',

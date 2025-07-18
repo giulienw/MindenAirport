@@ -1,3 +1,5 @@
+// Package middleware provides HTTP middleware functions for the MindenAirport API.
+// This includes authentication, CORS, logging, and other cross-cutting concerns.
 package middleware
 
 import (
@@ -9,7 +11,20 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// AuthMiddleware validates JWT tokens
+// AuthMiddleware validates JWT tokens for protected routes.
+// This middleware checks for a valid Bearer token in the Authorization header
+// and validates it using the JWT utility functions.
+//
+// Expected header format: "Authorization: Bearer <jwt-token>"
+//
+// If validation succeeds, the middleware sets the following in the Gin context:
+//   - "userID": The authenticated user's ID
+//   - "email": The authenticated user's email
+//
+// Returns HTTP 401 Unauthorized if:
+//   - No Authorization header is present
+//   - Header doesn't start with "Bearer "
+//   - Token is invalid, expired, or malformed
 func AuthMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		authHeader := c.GetHeader("Authorization")

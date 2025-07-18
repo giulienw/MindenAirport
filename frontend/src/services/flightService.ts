@@ -1,7 +1,34 @@
+/**
+ * Flight Service
+ * 
+ * This service handles all flight-related data operations including retrieving
+ * flight information, airport data, airline details, and flight statuses.
+ * It provides enriched flight data by combining multiple data sources for
+ * improved user experience.
+ * 
+ * Key features:
+ * - Flight data retrieval and caching
+ * - Airport and airline information management
+ * - Flight status tracking
+ * - Data enrichment by joining related entities
+ * - Individual flight lookup by ID
+ * 
+ * @module FlightService
+ */
+
 import type { Flight, Airport, FlightStatus, Airline, FlightDisplayInfo } from '@/types';
 import { API_BASE_URL } from '@/config';
 
+/**
+ * Flight service object containing all flight-related methods
+ */
 export const flightService = {
+  /**
+   * Retrieves all flights from the backend API
+   * 
+   * @returns Promise resolving to array of Flight objects
+   * @throws Error if API request fails
+   */
   async getFlights(): Promise<Flight[]> {
     try {
       const response = await fetch(`${API_BASE_URL}/flight`);
@@ -15,6 +42,12 @@ export const flightService = {
     }
   },
 
+  /**
+   * Retrieves all airport information from the backend API
+   * 
+   * @returns Promise resolving to array of Airport objects
+   * @throws Error if API request fails
+   */
   async getAirports(): Promise<Airport[]> {
     try {
       const response = await fetch(`${API_BASE_URL}/airport`);
@@ -28,6 +61,12 @@ export const flightService = {
     }
   },
 
+  /**
+   * Retrieves all flight status definitions from the backend API
+   * 
+   * @returns Promise resolving to array of FlightStatus objects
+   * @throws Error if API request fails
+   */
   async getFlightStatuses(): Promise<FlightStatus[]> {
     try {
       const response = await fetch(`${API_BASE_URL}/flightStatus`);
@@ -41,6 +80,12 @@ export const flightService = {
     }
   },
 
+  /**
+   * Retrieves all airline information from the backend API
+   * 
+   * @returns Promise resolving to array of Airline objects
+   * @throws Error if API request fails
+   */
   async getAirlines(): Promise<Airline[]> {
     try {
       const response = await fetch(`${API_BASE_URL}/airline`);
@@ -54,6 +99,17 @@ export const flightService = {
     }
   },
 
+  /**
+   * Retrieves enriched flight data by combining flights with related entities
+   * 
+   * This method fetches flights, airports, flight statuses, and airlines in parallel,
+   * then combines them to create enriched flight objects with full relational data.
+   * This reduces the need for multiple API calls in components and provides
+   * complete flight information for display.
+   * 
+   * @returns Promise resolving to array of FlightDisplayInfo objects with enriched data
+   * @throws Error if any API request fails
+   */
   async getEnrichedFlights(): Promise<FlightDisplayInfo[]> {
     try {
       const [flights, airports, flightStatuses, airlines] = await Promise.all([
@@ -80,6 +136,13 @@ export const flightService = {
     }
   },
 
+  /**
+   * Retrieves a specific flight by its ID
+   * 
+   * @param flightId - The unique identifier of the flight to retrieve
+   * @returns Promise resolving to FlightDisplayInfo object or null if not found
+   * @throws Error if API request fails
+   */
   async getFlightById(flightId: string): Promise<FlightDisplayInfo | null> {
     try {
       const response = await fetch(`${API_BASE_URL}/flight/${flightId}`);

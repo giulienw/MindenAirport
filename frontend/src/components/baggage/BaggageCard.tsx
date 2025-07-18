@@ -1,7 +1,26 @@
+/**
+ * BaggageCard Component
+ * 
+ * A reusable card component for displaying individual baggage item information.
+ * Shows baggage details including status, weight, type, and special handling
+ * requirements with appropriate visual indicators and status colors.
+ * 
+ * Features:
+ * - Status-based visual indicators and colors
+ * - Weight formatting with appropriate units
+ * - Special handling tags display
+ * - Responsive card layout
+ * - Icon-based status representation
+ * 
+ * @param props - Component props
+ * @param props.baggage - Baggage item data to display
+ */
+
 import { Package, AlertTriangle, CheckCircle, Truck } from 'lucide-react';
 import type { BaggageItem } from '@/types';
 
 interface BaggageCardProps {
+  /** Baggage item data to display */
   baggage: BaggageItem;
 }
 

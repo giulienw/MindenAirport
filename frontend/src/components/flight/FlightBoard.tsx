@@ -1,16 +1,44 @@
+/**
+ * FlightBoard Component
+ * 
+ * A comprehensive flight information display component that shows all flights
+ * with filtering and sorting capabilities. Provides a real-time view of
+ * airport operations with user-friendly filtering options.
+ * 
+ * Features:
+ * - Filter flights by type (all, departures, arrivals)
+ * - Filter flights by status (on time, delayed, cancelled, etc.)
+ * - Automatic sorting by scheduled departure time
+ * - Loading states with skeleton animations
+ * - Responsive grid layout
+ * - Real-time flight count display
+ * 
+ * @param props - Component props
+ * @param props.flights - Array of flight data to display
+ * @param props.loading - Loading state for showing skeleton UI
+ */
+
 import { useState, useMemo } from 'react';
 import type { FlightDisplayInfo } from '@/types';
 import { FlightCard } from './FlightCard';
 
 interface FlightBoardProps {
+  /** Array of flights to display */
   flights: FlightDisplayInfo[];
+  /** Loading state for skeleton UI */
   loading?: boolean;
 }
 
 export function FlightBoard({ flights, loading }: FlightBoardProps) {
+  // Filter state for flight type (all, departures, arrivals)
   const [filter, setFilter] = useState<'all' | 'departures' | 'arrivals'>('all');
+  // Filter state for flight status
   const [statusFilter, setStatusFilter] = useState<string>('all');
 
+  /**
+   * Memoized filtered and sorted flights based on current filter settings
+   * Implements filtering logic for flight type and status, plus sorting by departure time
+   */
   const filteredFlights = useMemo(() => {
     let filtered = flights;
 
@@ -45,11 +73,16 @@ export function FlightBoard({ flights, loading }: FlightBoardProps) {
     );
   }, [flights, filter, statusFilter]);
 
+  /**
+   * Memoized array of unique flight statuses for filter dropdown
+   * Extracts all unique status values from the flights array
+   */
   const statusOptions = useMemo(() => {
     const statuses = new Set(flights.map(f => f.statusInfo?.name).filter(Boolean));
     return Array.from(statuses);
   }, [flights]);
 
+  // Show loading skeleton while data is being fetched
   if (loading) {
     return (
       <div className="space-y-4">

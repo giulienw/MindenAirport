@@ -1,12 +1,36 @@
+/**
+ * useBaggage Hook
+ * 
+ * Custom React hook for managing user baggage data and operations.
+ * Provides state management for baggage tracking, lost baggage reporting,
+ * and data refresh capabilities with comprehensive error handling.
+ * 
+ * Features:
+ * - Automatic baggage data fetching on mount
+ * - Loading and error state management
+ * - Lost baggage reporting functionality
+ * - Manual data refresh capability
+ * - User-specific baggage filtering
+ * 
+ * @returns Object containing baggage array, states, and action functions
+ */
+
 import { useState, useEffect } from 'react';
 import type { BaggageItem } from '@/types';
 import { baggageService } from '@/services';
 
 export function useBaggage() {
+  // Baggage items state
   const [baggage, setBaggage] = useState<BaggageItem[]>([]);
+  // Loading state for UI feedback
   const [loading, setLoading] = useState(true);
+  // Error state for error handling and display
   const [error, setError] = useState<string | null>(null);
 
+  /**
+   * Fetches user's baggage data from the service layer
+   * Handles loading states and error management
+   */
   const fetchBaggage = async () => {
     try {
       setLoading(true);
@@ -27,10 +51,21 @@ export function useBaggage() {
     }
   };
 
+  /**
+   * Manually refetch baggage data
+   * Useful for refresh operations and data synchronization
+   */
   const refetchBaggage = () => {
     fetchBaggage();
   };
 
+  /**
+   * Report a baggage item as lost
+   * 
+   * @param baggageId - ID of the baggage item to report as lost
+   * @param description - Description of the loss circumstances
+   * @throws Error if reporting fails
+   */
   const reportLostBaggage = async (baggageId: string, description: string) => {
     try {
       setError(null);
@@ -41,8 +76,9 @@ export function useBaggage() {
       setError(err instanceof Error ? err.message : 'Failed to report lost baggage');
       throw err;
     }
-  };
+    };
 
+  // Fetch baggage data on component mount
   useEffect(() => {
     fetchBaggage();
   }, []);
