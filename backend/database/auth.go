@@ -24,10 +24,7 @@ import (
 //   - *models.AirportUser: The user record if found, nil if not found
 //   - error: Any database error that occurred during the operation
 func (db Database) GetUserByEmail(email string) (*models.AirportUser, error) {
-	stmt, err := db.Prepare(`
-	BEGIN 
-	GetUserByEmail(:1, :2); END;
-	`)
+	stmt, err := db.Prepare(`BEGIN MindenAirport.GetUserByEmail(:1, :2); END;`)
 	if err != nil {
 		return nil, err
 	}
@@ -72,10 +69,7 @@ func (db Database) GetUserByEmail(email string) (*models.AirportUser, error) {
 //   - *models.AirportUser: The user record if found, nil if not found
 //   - error: Any database error that occurred during the operation
 func (db Database) GetUserByID(id string) (*models.AirportUser, error) {
-	stmt, err := db.Prepare(`
-	BEGIN 
-	GetUserByID(:1, :2); END;
-	`)
+	stmt, err := db.Prepare(`BEGIN MindenAirport.GetUserByID(:1, :2); END;`)
 	if err != nil {
 		return nil, err
 	}
@@ -122,7 +116,7 @@ func (db Database) CreateUser(req models.RegisterRequest) (*models.AirportUser, 
 	userID := uuid.New().String()
 
 	// Call stored procedure
-	_, err = db.Exec("BEGIN CreateUserWithRole(:1, :2, :3, :4, :5, :6, :7, :8, :9); END;",
+	_, err = db.Exec("BEGIN MindenAirport.CreateUserWithRole(:1, :2, :3, :4, :5, :6, :7, :8, :9); END;",
 		userID,
 		req.FirstName,
 		req.LastName,
@@ -155,17 +149,10 @@ func (db Database) CreateUser(req models.RegisterRequest) (*models.AirportUser, 
 	return user, nil
 }
 
-// UpdateUserLastLogin updates the user's last login time
-func (db Database) UpdateUserLastLogin(userID string) error {
-	query := `UPDATE AIRPORTUSER SET LAST_LOGIN = :1 WHERE ID = :2`
-	_, err := db.Exec(query, time.Now(), userID)
-	return err
-}
-
 // DeactivateUser deactivates a user account
 func (db Database) DeactivateUser(userID string, active int) error {
 	fmt.Println("Deactivating user:", userID, "Active:", active)
-	query := `BEGIN SetUserActiveStatus(:1, :2); END;`
+	query := `BEGIN MindenAirport.SetUserActiveStatus(:1, :2); END;`
 	_, err := db.Exec(query, userID, active)
 	return err
 }
@@ -173,7 +160,7 @@ func (db Database) DeactivateUser(userID string, active int) error {
 // CheckEmailExists checks if an email already exists in the database
 func (db Database) CheckEmailExists(email string) (bool, error) {
 	var exists int
-	stmt, err := db.Prepare(`BEGIN UserExistsByEmail(:1, :2); END;`)
+	stmt, err := db.Prepare(`BEGIN MindenAirport.MindenAirport.UserExistsByEmail(:1, :2); END;`)
 	if err != nil {
 		return false, err
 	}
@@ -190,7 +177,7 @@ func (db Database) GetAllUsers(page, limit int) ([]models.AirportUser, int, erro
 	var total int
 
 	// First get the total count using stored procedure
-	countStmt, err := db.Prepare(`BEGIN GetUserCount(:1); END;`)
+	countStmt, err := db.Prepare(`BEGIN MindenAirport.GetUserCount(:1); END;`)
 	if err != nil {
 		return nil, 0, err
 	}
@@ -205,7 +192,7 @@ func (db Database) GetAllUsers(page, limit int) ([]models.AirportUser, int, erro
 	// Get users with pagination using stored procedure
 	stmt, err := db.Prepare(`
 	BEGIN 
-	GetAllUsers(:1, :2, :3); END;
+	MindenAirport.GetAllUsers(:1, :2, :3); END;
 	`)
 	if err != nil {
 		return nil, 0, err
@@ -251,14 +238,14 @@ func (db Database) UpdateUserByAdmin(userID, firstName, lastName, email, phone s
 	}
 
 	// Call stored procedure
-	query := `BEGIN UpdateUserByAdmin(:1, :2, :3, :4, :5, :6, :7); END;`
+	query := `BEGIN MindenAirport.UpdateUserByAdmin(:1, :2, :3, :4, :5, :6, :7); END;`
 	_, err := db.Exec(query, userID, firstName, lastName, email, phone, activeValue, role)
 	return err
 }
 
 func (db Database) GetUserCount() int {
 	var count int
-	stmt, err := db.Prepare(`BEGIN GetUserCount(:1); END;`)
+	stmt, err := db.Prepare(`BEGIN MindenAirport.GetUserCount(:1); END;`)
 	if err != nil {
 		log.Printf("Error preparing statement: %v", err)
 		return 0

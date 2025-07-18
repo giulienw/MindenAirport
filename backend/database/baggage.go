@@ -13,10 +13,7 @@ import (
 
 // GetBaggageByID retrieves a specific baggage by ID
 func (db Database) GetBaggageByID(id string) (*models.Baggage, error) {
-	stmt, err := db.Prepare(`
-	BEGIN 
-	GetBaggageByID(:1, :2); END;
-	`)
+	stmt, err := db.Prepare(`BEGIN MindenAirport.GetBaggageByID(:1, :2); END;`)
 	if err != nil {
 		return nil, err
 	}
@@ -52,10 +49,7 @@ func (db Database) GetBaggageByID(id string) (*models.Baggage, error) {
 
 // GetBaggageByUserID retrieves all baggage for a specific user
 func (db Database) GetBaggageByUserID(userID string) ([]models.Baggage, error) {
-	stmt, err := db.Prepare(`
-	BEGIN 
-	GetBaggageByUserID(:1, :2); END;
-	`)
+	stmt, err := db.Prepare(`BEGIN MindenAirport.GetBaggageByUserID(:1, :2); END;`)
 	if err != nil {
 		return nil, err
 	}
@@ -95,10 +89,7 @@ func (db Database) GetBaggageByUserID(userID string) ([]models.Baggage, error) {
 
 // GetBaggageByFlightID retrieves all baggage for a specific flight
 func (db Database) GetBaggageByFlightID(flightID string) ([]models.Baggage, error) {
-	stmt, err := db.Prepare(`
-	BEGIN 
-	GetBaggageByFlightID(:1, :2); END;
-	`)
+	stmt, err := db.Prepare(`BEGIN MindenAirport.GetBaggageByFlightID(:1, :2); END;`)
 	if err != nil {
 		return nil, err
 	}
@@ -149,7 +140,7 @@ func (db Database) CreateBaggage(baggage models.Baggage) (*models.Baggage, error
 	}
 
 	// Call stored procedure
-	query := `BEGIN CreateBaggage(:1, :2, :3, :4, :5, :6, :7, :8); END;`
+	query := `BEGIN MindenAirport.CreateBaggage(:1, :2, :3, :4, :5, :6, :7, :8); END;`
 	_, err := db.Exec(query,
 		baggage.ID,
 		baggage.AirportUserID,
@@ -172,7 +163,7 @@ func (db Database) CreateBaggage(baggage models.Baggage) (*models.Baggage, error
 // UpdateBaggage updates an existing baggage entry
 func (db Database) UpdateBaggage(id string, baggage models.Baggage) (*models.Baggage, error) {
 	// Call stored procedure
-	query := `BEGIN UpdateBaggage(:1, :2, :3, :4, :5, :6, :7, :8); END;`
+	query := `BEGIN MindenAirport.UpdateBaggage(:1, :2, :3, :4, :5, :6, :7, :8); END;`
 	_, err := db.Exec(query,
 		id,
 		baggage.AirportUserID,
@@ -196,17 +187,14 @@ func (db Database) UpdateBaggage(id string, baggage models.Baggage) (*models.Bag
 // DeleteBaggage deletes a baggage entry
 func (db Database) DeleteBaggage(id string) error {
 	// Call stored procedure
-	query := `BEGIN DeleteBaggage(:1); END;`
+	query := `BEGIN MindenAirport.DeleteBaggage(:1); END;`
 	_, err := db.Exec(query, id)
 	return err
 }
 
 // GetBaggageByTrackingNumber retrieves baggage by tracking number
 func (db Database) GetBaggageByTrackingNumber(trackingNumber string) (*models.Baggage, error) {
-	stmt, err := db.Prepare(`
-	BEGIN 
-	GetBaggageByTrackingNumber(:1, :2); END;
-	`)
+	stmt, err := db.Prepare(`BEGIN MindenAirport.GetBaggageByTrackingNumber(:1, :2); END;`)
 	if err != nil {
 		return nil, err
 	}
@@ -246,7 +234,7 @@ func (db Database) GetAllBaggage(page, limit int) ([]models.Baggage, int, error)
 	var total int
 
 	// First get the total count using stored procedure
-	countQuery := `BEGIN GetBaggageCount(:1); END;`
+	countQuery := `BEGIN MindenAirport.GetBaggageCount(:1); END;`
 	_, err := db.Exec(countQuery, sql.Out{Dest: &total})
 	if err != nil {
 		return nil, 0, err
@@ -256,7 +244,7 @@ func (db Database) GetAllBaggage(page, limit int) ([]models.Baggage, int, error)
 	offset := (page - 1) * limit
 
 	// Get baggage with pagination using stored procedure
-	query := `BEGIN GetAllBaggage(:1, :2, :3); END;`
+	query := `BEGIN MindenAirport.GetAllBaggage(:1, :2, :3); END;`
 	var cursor sql.Rows
 	_, err = db.Exec(query, offset, limit, sql.Out{Dest: &cursor})
 	if err != nil {

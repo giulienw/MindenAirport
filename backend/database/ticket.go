@@ -137,7 +137,7 @@ func (db Database) GetAllTickets(page, limit int) ([]models.Ticket, int, error) 
 	var total int
 
 	// First get the total count using stored procedure
-	countStmt, err := db.Prepare(`BEGIN GetTicketCount(:1); END;`)
+	countStmt, err := db.Prepare(`BEGIN MindenAirport.GetTicketCount(:1); END;`)
 	if err != nil {
 		return nil, 0, err
 	}
@@ -150,10 +150,7 @@ func (db Database) GetAllTickets(page, limit int) ([]models.Ticket, int, error) 
 	offset := (page - 1) * limit
 
 	// Get tickets with pagination using stored procedure
-	stmt, err := db.Prepare(`
-	BEGIN 
-	GetAllTickets(:1, :2, :3); END;
-	`)
+	stmt, err := db.Prepare(`BEGIN MindenAirport.GetAllTickets(:1, :2, :3); END;`)
 	if err != nil {
 		return nil, 0, err
 	}
@@ -216,7 +213,7 @@ func (db Database) CalculateRevenue() (int, error) {
 	var total int
 
 	// Call stored procedure
-	stmt, err := db.Prepare(`BEGIN CalculateRevenue(:1); END;`)
+	stmt, err := db.Prepare(`BEGIN MindenAirport.CalculateRevenue(:1); END;`)
 	if err != nil {
 		return 0, err
 	}

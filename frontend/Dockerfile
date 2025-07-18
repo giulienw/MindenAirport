@@ -1,13 +1,10 @@
 # Build stage
-FROM node:18-alpine AS builder
+FROM oven/bun:1 AS builder
 
 ENV VITE_API_BASE_URL=/api
 
 # Set working directory
 WORKDIR /app
-
-# Install Bun
-RUN npm install -g bun
 
 # Copy package files
 COPY package.json bun.lockb ./

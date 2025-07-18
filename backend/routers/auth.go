@@ -120,12 +120,6 @@ func Login(db database.Database) gin.HandlerFunc {
 			return
 		}
 
-		// Update last login time
-		if err := db.UpdateUserLastLogin(user.ID); err != nil {
-			// Log error but don't fail the login
-			// log.Printf("Failed to update last login for user %s: %v", user.ID, err)
-		}
-
 		// Generate JWT token
 		token, expiresAt, err := utils.GenerateJWT(user.ID, user.Email)
 		if err != nil {
