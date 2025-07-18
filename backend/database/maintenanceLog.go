@@ -2,26 +2,44 @@ package database
 
 import (
 	"database/sql"
+	"database/sql/driver"
 	"log"
 	"mindenairport/models"
+	"time"
 )
 
 func (db Database) GetMaintenanceLogById(id string) models.MaintenanceLog {
-	query := `BEGIN GetMaintenanceLogByID(:1, :2); END;`
-
-	var cursor *sql.Rows
-	_, err := db.Exec(query, id, sql.Out{Dest: &cursor})
+	stmt, err := db.Prepare(`
+	BEGIN 
+	GetMaintenanceLogByID(:1, :2); END;
+	`)
 	if err != nil {
-		log.Fatal("Error calling stored procedure:", err)
+		log.Fatal("Error preparing statement:", err)
 	}
+
+	var cursor driver.Rows
+	_, err = stmt.Exec(id, sql.Out{Dest: &cursor})
+	if err != nil {
+		log.Fatal("Failed to execute prepared statement:", err)
+	}
+
+	r := make([]driver.Value, len(cursor.Columns()))
 	defer cursor.Close()
 
 	var maintenanceLog models.MaintenanceLog
 
-	if cursor.Next() {
-		err := cursor.Scan(&maintenanceLog.ID, &maintenanceLog.PlaneID, &maintenanceLog.MaintenanceDate, &maintenanceLog.Description, &maintenanceLog.Technician, &maintenanceLog.NextMaintenance)
-		if err != nil {
-			log.Fatal("Error scanning maintenance log data:", err)
+	err = cursor.Next(r)
+	if err == nil {
+		maintenanceLog.ID = r[0].(string)
+		maintenanceLog.PlaneID = r[1].(string)
+		if r[2] != nil {
+			maintenanceLog.MaintenanceDate = r[2].(time.Time)
+		}
+		maintenanceLog.Description = r[3].(string)
+		maintenanceLog.Technician = r[4].(string)
+		if r[5] != nil {
+			t := r[5].(time.Time)
+			maintenanceLog.NextMaintenance = &t
 		}
 	}
 
@@ -29,22 +47,41 @@ func (db Database) GetMaintenanceLogById(id string) models.MaintenanceLog {
 }
 
 func (db Database) GetMaintenanceLogs() []models.MaintenanceLog {
-	query := `BEGIN GetMaintenanceLogs(:1); END;`
-
-	var cursor *sql.Rows
-	_, err := db.Exec(query, sql.Out{Dest: &cursor})
+	stmt, err := db.Prepare(`
+	BEGIN 
+	GetMaintenanceLogs(:1); END;
+	`)
 	if err != nil {
-		log.Fatal("Error calling stored procedure:", err)
+		log.Fatal("Error preparing statement:", err)
 	}
+
+	var cursor driver.Rows
+	_, err = stmt.Exec(sql.Out{Dest: &cursor})
+	if err != nil {
+		log.Fatal("Failed to execute prepared statement:", err)
+	}
+
+	r := make([]driver.Value, len(cursor.Columns()))
 	defer cursor.Close()
 
 	var maintenanceLogs []models.MaintenanceLog
 
-	for cursor.Next() {
-		var maintenanceLog models.MaintenanceLog
-		err := cursor.Scan(&maintenanceLog.ID, &maintenanceLog.PlaneID, &maintenanceLog.MaintenanceDate, &maintenanceLog.Description, &maintenanceLog.Technician, &maintenanceLog.NextMaintenance)
+	for {
+		err := cursor.Next(r)
 		if err != nil {
-			log.Fatal("Error scanning maintenance log data:", err)
+			break
+		}
+		var maintenanceLog models.MaintenanceLog
+		maintenanceLog.ID = r[0].(string)
+		maintenanceLog.PlaneID = r[1].(string)
+		if r[2] != nil {
+			maintenanceLog.MaintenanceDate = r[2].(time.Time)
+		}
+		maintenanceLog.Description = r[3].(string)
+		maintenanceLog.Technician = r[4].(string)
+		if r[5] != nil {
+			t := r[5].(time.Time)
+			maintenanceLog.NextMaintenance = &t
 		}
 		maintenanceLogs = append(maintenanceLogs, maintenanceLog)
 	}
