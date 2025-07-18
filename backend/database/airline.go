@@ -8,7 +8,7 @@ import (
 )
 
 func (db Database) GetAirlineByID(id string) models.Airline {
-	query := `BEGIN GetAirlineByID(:1, :2); END;`
+	query := `BEGIN MindenAirport.GetAirlineByID(:1, :2); END;`
 
 	stmt, err := db.Prepare(query)
 	if err != nil {
@@ -50,7 +50,7 @@ func (db Database) GetAirlineByID(id string) models.Airline {
 }
 
 func (db Database) GetAirlines() []models.Airline {
-	query := `BEGIN GetAllAirlines(:1); END;`
+	query := `BEGIN MindenAirport.GetAllAirlines(:1); END;`
 
 	stmt, err := db.Prepare(query)
 	if err != nil {

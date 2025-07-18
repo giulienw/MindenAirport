@@ -10,9 +10,7 @@ import (
 
 func (db Database) GetMaintenanceLogById(id string) models.MaintenanceLog {
 	stmt, err := db.Prepare(`
-	BEGIN 
-	GetMaintenanceLogByID(:1, :2); END;
-	`)
+	BEGIN MindenAirport.GetMaintenanceLogByID(:1, :2); END;`)
 	if err != nil {
 		log.Fatal("Error preparing statement:", err)
 	}
@@ -48,9 +46,7 @@ func (db Database) GetMaintenanceLogById(id string) models.MaintenanceLog {
 
 func (db Database) GetMaintenanceLogs() []models.MaintenanceLog {
 	stmt, err := db.Prepare(`
-	BEGIN 
-	GetMaintenanceLogs(:1); END;
-	`)
+	BEGIN MindenAirport.GetMaintenanceLogs(:1); END;`)
 	if err != nil {
 		log.Fatal("Error preparing statement:", err)
 	}

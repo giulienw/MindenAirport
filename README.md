@@ -211,10 +211,7 @@ The project includes Docker configurations for deployment. The backend uses the 
 
 2. **Configure your database credentials:**
    ```bash
-   # Copy the environment template
-   cp backend/.env.template backend/.env
-   
-   # Edit backend/.env with your Oracle database credentials:
+   # Edit enviorment variables in docker compose file with your Oracle database credentials:
    # CONNECTIONSTRING="your_username/your_password@ORCL"
    # JWT_SECRET="your_jwt_secret_here"
    ```
@@ -299,8 +296,7 @@ bun run build:electron
    - Check if ports are available
 
 3. **Environment Variables:**
-   - Ensure `.env` files are properly configured
-   - Don't commit `.env` files to version control
+   - Ensure enviroment variables are properly configured
    - Verify Oracle database credentials are correct
 
 4. **Dependencies:**

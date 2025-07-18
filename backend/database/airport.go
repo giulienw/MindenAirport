@@ -11,11 +11,7 @@ import (
 )
 
 func (db Database) GetAirports() []models.Airport {
-	var query = `
-	BEGIN 
-		GetAllAirports(:1); 
-	END;
-	`
+	var query = `BEGIN MindenAirport.GetAllAirports(:1); END;`
 	stmt, err := db.Prepare(query)
 	if err != nil {
 		log.Printf("Error calling stored procedure: %v", err)
@@ -60,10 +56,7 @@ func (db Database) GetAirports() []models.Airport {
 }
 
 func (db Database) GetAirportByID(id string) models.Airport {
-	stmt, err := db.Prepare(`
-	BEGIN 
-	GetAirportByID(:1, :2); END;
-	`)
+	stmt, err := db.Prepare(`BEGIN MindenAirport.GetAirportByID(:1, :2); END;`)
 	if err != nil {
 		log.Printf("Error preparing statement: %v", err)
 		return models.Airport{}

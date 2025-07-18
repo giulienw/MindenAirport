@@ -12,9 +12,7 @@ import (
 
 func (db Database) GetFlightStatuses() []models.FlightStatus {
 	stmt, err := db.Prepare(`
-	BEGIN 
-	GetFlightStatuses(:1); END;
-	`)
+	BEGIN MindenAirport.GetFlightStatuses(:1); END;`)
 	if err != nil {
 		log.Fatal("Error preparing statement:", err)
 	}
@@ -48,10 +46,7 @@ func (db Database) GetFlightStatuses() []models.FlightStatus {
 }
 
 func (db Database) GetFlightStatusByID(id int) models.FlightStatus {
-	stmt, err := db.Prepare(`
-	BEGIN 
-	GetFlightStatusByID(:1, :2); END;
-	`)
+	stmt, err := db.Prepare(`BEGIN MindenAirport.GetFlightStatusByID(:1, :2); END;`)
 	if err != nil {
 		log.Fatal("Error preparing statement:", err)
 	}

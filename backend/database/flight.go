@@ -92,23 +92,8 @@ func (db Database) GetFlightByID(id string) (models.Flight, error) {
 // Returns:
 //   - []models.Flight: Slice of all flight records in the database
 func (db Database) GetFlights() []models.Flight {
-	var flights []models.Flight
-
-	rows, err := db.Query("SELECT ID, \"FROM\", \"TO\", PILOT, PLANE, TERMINAL, STATUS, SCHEDULED_DEPARTURE, ACTUAL_DEPARTURE, SCHEDULED_ARRIVAL, ACTUAL_ARRIVAL, GATE, BAGGAGE_CLAIM FROM FLIGHT")
-	if err != nil {
-		log.Fatal("Error querying the database:", err)
-	}
-	defer rows.Close()
-
-	for rows.Next() {
-		var flight models.Flight
-		err := rows.Scan(&flight.ID, &flight.From, &flight.To, &flight.PilotID, &flight.PlaneID, &flight.TerminalID, &flight.StatusID, &flight.ScheduledDeparture, &flight.ActualDeparture, &flight.ScheduledArrival, &flight.ActualArrival, &flight.Gate, &flight.BaggageClaim)
-		if err != nil {
-			log.Fatal("Error scanning the database:", err)
-		}
-		flights = append(flights, flight)
-	}
-	return flights
+	flight, _, _ := db.GetAllFlights(1, 1000)
+	return flight
 }
 
 func (db Database) GetAllFlights(page, limit int) ([]models.Flight, int, error) {
@@ -116,7 +101,7 @@ func (db Database) GetAllFlights(page, limit int) ([]models.Flight, int, error) 
 	var total int
 
 	// First get the total count using stored procedure
-	countStmt, err := db.Prepare(`BEGIN GetFlightCount(:1); END;`)
+	countStmt, err := db.Prepare(`BEGIN MindenAirport.GetFlightCount(:1); END;`)
 	if err != nil {
 		return nil, 0, err
 	}
@@ -129,10 +114,7 @@ func (db Database) GetAllFlights(page, limit int) ([]models.Flight, int, error) 
 	offset := (page - 1) * limit
 
 	// Get flights with pagination using stored procedure
-	stmt, err := db.Prepare(`
-	BEGIN 
-	GetAllFlights(:1, :2, :3); END;
-	`)
+	stmt, err := db.Prepare(`BEGIN MindenAirport.GetAllFlights(:1, :2, :3); END;`)
 	if err != nil {
 		return nil, 0, err
 	}
@@ -190,7 +172,7 @@ func (db Database) GetAllFlights(page, limit int) ([]models.Flight, int, error) 
 }
 
 func (db Database) CreateFlight(flight models.Flight) {
-	query := `BEGIN CreateFlight(:1, :2, :3, :4, :5, :6, :7, :8, :9, :10, :11, :12, :13); END;`
+	query := `BEGIN MindenAirport.CreateFlight(:1, :2, :3, :4, :5, :6, :7, :8, :9, :10, :11, :12, :13); END;`
 	_, err := db.Exec(query, flight.ID, flight.From, flight.To, flight.PilotID, flight.PlaneID, flight.TerminalID, flight.StatusID, flight.ScheduledDeparture, flight.ActualDeparture, flight.ScheduledArrival, flight.ActualArrival, flight.Gate, flight.BaggageClaim)
 	if err != nil {
 		log.Fatal("Error calling stored procedure:", err)
@@ -198,7 +180,7 @@ func (db Database) CreateFlight(flight models.Flight) {
 }
 
 func (db Database) UpdateFlight(flight models.Flight) {
-	query := `BEGIN UpdateFlight(:1, :2, :3, :4, :5, :6, :7, :8, :9, :10, :11, :12, :13); END;`
+	query := `BEGIN MindenAirport.UpdateFlight(:1, :2, :3, :4, :5, :6, :7, :8, :9, :10, :11, :12, :13); END;`
 	_, err := db.Exec(query, flight.ID, flight.From, flight.To, flight.PilotID, flight.PlaneID, flight.TerminalID, flight.StatusID, flight.ScheduledDeparture, flight.ActualDeparture, flight.ScheduledArrival, flight.ActualArrival, flight.Gate, flight.BaggageClaim)
 	if err != nil {
 		log.Fatal("Error calling stored procedure:", err)
@@ -206,7 +188,7 @@ func (db Database) UpdateFlight(flight models.Flight) {
 }
 
 func (db Database) DeleteFlight(id string) {
-	query := `BEGIN DeleteFlight(:1); END;`
+	query := `BEGIN MindenAirport.DeleteFlight(:1); END;`
 	_, err := db.Exec(query, id)
 	if err != nil {
 		log.Fatal("Error calling stored procedure:", err)
