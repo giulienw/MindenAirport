@@ -8,6 +8,7 @@ import type {
 } from "@/types";
 import { flightService } from "./flightService";
 import { API_BASE_URL } from "@/config";
+import { getCookie } from "@/lib/utils";
 
 export const authService = {
   async login(credentials: LoginCredentials): Promise<AuthResponse> {
@@ -43,7 +44,6 @@ export const authService = {
         token: result.data.token,
       };
       
-      localStorage.setItem("token", authResponse.token);
       localStorage.setItem("user", JSON.stringify(authResponse.user));
       return authResponse;
     } catch (error) {
@@ -96,7 +96,6 @@ export const authService = {
         token: result.data.token,
       };
       
-      localStorage.setItem("token", authResponse.token);
       localStorage.setItem("user", JSON.stringify(authResponse.user));
       return authResponse;
     } catch (error) {
@@ -109,7 +108,7 @@ export const authService = {
     try {
       const response = await fetch(`${API_BASE_URL}/ticket/my`, {
         headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
+          Authorization: `Bearer ${authService.getToken()}`,
         },
       });
 
@@ -138,7 +137,7 @@ export const authService = {
     try {
       const response = await fetch(`${API_BASE_URL}/auth/profile`, {
         headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
+          Authorization: `Bearer ${authService.getToken()}`,
         },
       });
 
@@ -199,9 +198,23 @@ export const authService = {
     }
   },
 
-  logout() {
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
+  async logout() {
+    try {
+      const response = await fetch(`${API_BASE_URL}/auth/logout`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Logout failed');
+      }
+    } catch (error) {
+      console.error('Logout error:', error);
+      throw error;
+    }
   },
 
   getCurrentUser(): User | null {
@@ -210,6 +223,11 @@ export const authService = {
   },
 
   isAuthenticated(): boolean {
-    return !!localStorage.getItem("token");
+    return !!getCookie("token");
   },
+
+  getToken(): string | null {
+    console.log(getCookie("token"))
+    return getCookie("token") || null;
+  }
 };

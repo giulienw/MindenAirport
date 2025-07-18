@@ -1,9 +1,10 @@
 import type { BaggageItem } from '@/types';
 import { API_BASE_URL } from '@/config';
+import { authService } from '@/services/authService';
 
 export const baggageService = {
   async getUserBaggage(): Promise<BaggageItem[]> {
-    const token = localStorage.getItem('token');
+    const token = authService.getToken();
     if (!token) {
       throw new Error('No authentication token found');
     }
@@ -32,7 +33,7 @@ export const baggageService = {
   },
 
   /*async getBaggageTracking(baggageId: string): Promise<any> {
-    const token = localStorage.getItem('token');
+    const token = authService.getToken();
     if (!token) {
       throw new Error('No authentication token found');
     }
@@ -59,7 +60,7 @@ export const baggageService = {
   },*/
 
   async reportLostBaggage(baggageId: string, description: string): Promise<void> {
-    const token = localStorage.getItem('token');
+    const token = authService.getToken();
     if (!token) {
       throw new Error('No authentication token found');
     }

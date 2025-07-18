@@ -17,6 +17,7 @@
   "dependencies": {
     "@tailwindcss/vite": "^4.1.8",
     "clsx": "^2.1.1",
+    "electron": "^37.2.3",
     "frontend": ".",
     "lucide-react": "^0.514.0",
     "react": "^19.1.0",
