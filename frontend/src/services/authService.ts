@@ -1,3 +1,20 @@
+/**
+ * Authentication Service
+ * 
+ * This service handles all authentication-related operations including user login,
+ * registration, session management, and user profile operations. It manages JWT tokens
+ * and provides secure communication with the backend authentication endpoints.
+ * 
+ * Key features:
+ * - User login and registration
+ * - JWT token management and validation
+ * - User profile retrieval and management
+ * - User dashboard data aggregation
+ * - Session persistence and cleanup
+ * 
+ * @module AuthService
+ */
+
 import type {
   LoginCredentials,
   AuthResponse,
@@ -10,7 +27,17 @@ import { flightService } from "./flightService";
 import { API_BASE_URL } from "@/config";
 import { getCookie } from "@/lib/utils";
 
+/**
+ * Authentication service object containing all auth-related methods
+ */
 export const authService = {
+  /**
+   * Authenticates a user with email and password
+   * 
+   * @param credentials - User login credentials
+   * @returns Promise resolving to authentication response with user data and token
+   * @throws Error if authentication fails
+   */
   async login(credentials: LoginCredentials): Promise<AuthResponse> {
     try {
       const response = await fetch(`${API_BASE_URL}/auth/login`, {

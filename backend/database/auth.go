@@ -1,3 +1,5 @@
+// Package database provides authentication-related database operations
+// for user management in the MindenAirport system.
 package database
 
 import (
@@ -12,7 +14,15 @@ import (
 	"github.com/google/uuid"
 )
 
-// GetUserByEmail retrieves a user by email
+// GetUserByEmail retrieves a user from the database by their email address.
+// Used primarily for login authentication to validate user credentials.
+//
+// Parameters:
+//   - email: The user's email address to search for
+//
+// Returns:
+//   - *models.AirportUser: The user record if found, nil if not found
+//   - error: Any database error that occurred during the operation
 func (db Database) GetUserByEmail(email string) (*models.AirportUser, error) {
 	stmt, err := db.Prepare(`
 	BEGIN 
@@ -52,7 +62,15 @@ func (db Database) GetUserByEmail(email string) (*models.AirportUser, error) {
 	return nil, nil // User not found
 }
 
-// GetUserByID retrieves a user by ID
+// GetUserByID retrieves a user from the database by their unique ID.
+// Used for token validation and user profile operations.
+//
+// Parameters:
+//   - id: The unique user identifier
+//
+// Returns:
+//   - *models.AirportUser: The user record if found, nil if not found
+//   - error: Any database error that occurred during the operation
 func (db Database) GetUserByID(id string) (*models.AirportUser, error) {
 	stmt, err := db.Prepare(`
 	BEGIN 

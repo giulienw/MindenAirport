@@ -1,3 +1,5 @@
+// Package routers provides HTTP route handlers for authentication endpoints
+// in the MindenAirport API, including registration, login, and user management.
 package routers
 
 import (
@@ -12,7 +14,22 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// Register handles user registration
+// Register handles new user registration requests.
+// This endpoint allows new users to create accounts in the system.
+//
+// Request body should contain:
+//   - firstName: User's first name (required)
+//   - lastName: User's last name (required)
+//   - email: Valid email address (required, must be unique)
+//   - password: Password with minimum 6 characters (required)
+//   - phone: Phone number (optional)
+//   - birthdate: Date of birth (required)
+//
+// Returns:
+//   - 201: Registration successful with JWT token and user info
+//   - 400: Invalid request data or validation errors
+//   - 409: Email already exists in the system
+//   - 500: Internal server error
 func Register(db database.Database) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var req models.RegisterRequest

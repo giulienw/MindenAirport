@@ -1,3 +1,24 @@
+/**
+ * BaggageView Component
+ * 
+ * A comprehensive baggage management interface that displays user's baggage
+ * with statistics, filtering, and management capabilities. Provides a dashboard
+ * view of all baggage items with status-based organization.
+ * 
+ * Features:
+ * - Baggage statistics dashboard (total, checked, carry-on, in-transit)
+ * - Search functionality for finding specific items
+ * - Status and type-based filtering capabilities
+ * - Responsive grid layout for baggage cards
+ * - Manual refresh functionality
+ * - Export capabilities for baggage data
+ * 
+ * @param props - Component props
+ * @param props.baggage - Array of baggage items to display
+ * @param props.onRefresh - Callback function for refresh operations
+ * @param props.loading - Loading state for UI feedback
+ */
+
 import { useState } from 'react';
 import { Package, Search, Download, RefreshCw } from 'lucide-react';
 import type { BaggageItem } from '@/types';
@@ -5,16 +26,25 @@ import { BaggageCard } from './BaggageCard';
 import { Button } from '@/components/ui';
 
 interface BaggageViewProps {
+  /** Array of baggage items to display */
   baggage: BaggageItem[];
+  /** Callback function for manual refresh operations */
   onRefresh?: () => void;
+  /** Loading state for showing UI feedback */
   loading?: boolean;
 }
 
 export function BaggageView({ baggage, onRefresh, loading = false }: BaggageViewProps) {
+  // Search term state for filtering baggage items by tracking number
   const [searchTerm, setSearchTerm] = useState('');
+  // Status filter for showing specific baggage statuses
   const [statusFilter, setStatusFilter] = useState<string>('all');
+  // Type filter for showing specific baggage types (carry-on, checked, etc.)
   const [typeFilter, setTypeFilter] = useState<string>('all');
 
+  /**
+   * Filter baggage items based on search term, status, and type filters
+   */
   const filteredBaggage = baggage.filter(item => {
     const matchesSearch = !searchTerm || 
       item.trackingNumber?.toLowerCase().includes(searchTerm.toLowerCase());
@@ -25,6 +55,10 @@ export function BaggageView({ baggage, onRefresh, loading = false }: BaggageView
     return matchesSearch && matchesStatus && matchesType;
   });
 
+  /**
+   * Calculate statistics for baggage dashboard
+   * Groups baggage by status for display metrics
+   */
   const getStatusStats = () => {
     const stats = baggage.reduce((acc, item) => {
       acc[item.status] = (acc[item.status] || 0) + 1;

@@ -1,7 +1,26 @@
+/**
+ * FlightCard Component
+ * 
+ * A reusable card component for displaying flight information in a structured format.
+ * Shows comprehensive flight details including departure/arrival times, route information,
+ * status, and additional flight details like gate and terminal information.
+ * 
+ * Features:
+ * - Responsive design with clean visual hierarchy
+ * - Status-based color coding for quick identification
+ * - Support for both scheduled and actual times
+ * - Route visualization with city names
+ * - Additional details like gate, terminal, and baggage claim
+ * 
+ * @param props - Component props
+ * @param props.flight - Flight data to display
+ */
+
 import { type FlightDisplayInfo } from '@/types';
 import { getFlightStatusColor as getStatusColor } from '@/lib/utils';
 
 interface FlightCardProps {
+  /** Flight data to display in the card */
   flight: FlightDisplayInfo;
 }
 

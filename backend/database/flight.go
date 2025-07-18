@@ -1,3 +1,5 @@
+// Package database provides flight-related database operations for the MindenAirport system.
+// This includes flight retrieval, creation, updates, and management functions.
 package database
 
 import (
@@ -12,6 +14,15 @@ import (
 	"github.com/godror/godror"
 )
 
+// GetFlightByID retrieves a specific flight from the database by its unique identifier.
+// This function calls the Oracle stored procedure GetFlightByID to fetch flight details.
+//
+// Parameters:
+//   - id: The unique flight identifier
+//
+// Returns:
+//   - models.Flight: The flight record with all details
+//   - error: Any database error that occurred during retrieval
 func (db Database) GetFlightByID(id string) (models.Flight, error) {
 	stmt, err := db.Prepare(`
 	BEGIN 
@@ -70,7 +81,16 @@ func (db Database) GetFlightByID(id string) (models.Flight, error) {
 	return flight, nil
 }
 
-// Deprecated: Because missing error handling and not using context. Use GetAllFlights instead
+// GetFlights retrieves all flights from the database.
+//
+// DEPRECATED: This function lacks proper error handling and context management.
+// Use GetAllFlights instead for production code.
+//
+// This function executes a direct SQL query to fetch all flight records
+// and returns them as a slice. It logs fatal errors instead of returning them.
+//
+// Returns:
+//   - []models.Flight: Slice of all flight records in the database
 func (db Database) GetFlights() []models.Flight {
 	var flights []models.Flight
 
