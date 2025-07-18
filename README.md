@@ -261,9 +261,6 @@ The Docker setup uses the following environment variables:
 - `CONNECTIONSTRING=your_username/your_password@ORCL`
 - `JWT_SECRET=your_jwt_secret_here_change_in_production`
 
-**Frontend:**
-- `VITE_API_BASE_URL=http://localhost:8080`
-
 ### Docker Troubleshooting
 
 **Common Docker Issues:**
