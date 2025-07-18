@@ -15,7 +15,7 @@ A full-stack airport management system built with Go (backend) and React + Elect
 - [Development](#development)
 - [Building for Production](#building-for-production)
 
-## 🚀 Prerequisites
+## 🚀 Prerequisites for Manual setup
 
 Before running this project, make sure you have the following installed:
 
@@ -45,6 +45,62 @@ MindenAirport/
 ├── imgs/            # Images and diagrams
 └── scripts/         # Database scripts
 ```
+
+## 🐳 Docker Setup
+
+The project includes Docker configurations for deployment. The backend uses the devcontainer setup with Oracle Instant Client and connects to an external Oracle database via tnsnames.ora configuration.
+
+### Prerequisites for Docker Setup
+
+- **Docker Desktop** - [Download Docker Desktop](https://www.docker.com/products/docker-desktop/)
+- **Database credentials** - Username and password for the Oracle database
+
+### Quick Start with Docker
+
+1. **Clone the repository and navigate to the project root:**
+   ```bash
+   git clone <repository-url>
+   cd MindenAirport
+   ```
+
+2. **Configure your database credentials:**
+   ```bash
+   # Edit enviorment variables in docker compose file with your Oracle database credentials:
+   # CONNECTIONSTRING="your_username/your_password@ORCL"
+   # JWT_SECRET="your_jwt_secret_here"
+   ```
+
+3. **Run docker-compose**
+   ```bash
+   docker-compose up -d
+   ```
+
+   This will start:
+   - Backend API on port `8080`
+   - Frontend web app on port `3000`
+
+4. **Access the application:**
+   - Frontend: `http://localhost:3000`
+   - Backend API: `http://localhost:8080`
+
+
+### Docker Services
+
+| Service | Container Name | Port | Description |
+|---------|---------------|------|-------------|
+| `backend` | `minden_backend` | 8080 | Go API Server with Oracle Client |
+| `frontend` | `minden_frontend` | 3000 | React Web App |
+
+
+### Environment Variables for Docker
+
+The Docker setup uses the following environment variables:
+
+**Backend:**
+- `CONNECTIONSTRING=your_username/your_password@ORCL`
+- `JWT_SECRET=your_jwt_secret_here_change_in_production`
+
+## ⚙️ Manual Setup
 
 ## ⚙️ Environment Setup
 
@@ -191,62 +247,6 @@ go build               # Build binary
 go mod download        # Download dependencies
 go mod tidy           # Clean up dependencies
 ```
-
-## 🐳 Docker Setup
-
-The project includes Docker configurations for deployment. The backend uses the devcontainer setup with Oracle Instant Client and connects to an external Oracle database via tnsnames.ora configuration.
-
-### Prerequisites for Docker Setup
-
-- **Docker Desktop** - [Download Docker Desktop](https://www.docker.com/products/docker-desktop/)
-- **Database credentials** - Username and password for the Oracle database
-
-### Quick Start with Docker
-
-1. **Clone the repository and navigate to the project root:**
-   ```bash
-   git clone <repository-url>
-   cd MindenAirport
-   ```
-
-2. **Configure your database credentials:**
-   ```bash
-   # Edit enviorment variables in docker compose file with your Oracle database credentials:
-   # CONNECTIONSTRING="your_username/your_password@ORCL"
-   # JWT_SECRET="your_jwt_secret_here"
-   ```
-
-3. **Run the setup script**
-
-   **Or run manually:**
-   ```bash
-   docker-compose up -d
-   ```
-
-   This will start:
-   - Backend API on port `8080`
-   - Frontend web app on port `3000`
-
-4. **Access the application:**
-   - Frontend: `http://localhost:3000`
-   - Backend API: `http://localhost:8080`
-
-
-### Docker Services
-
-| Service | Container Name | Port | Description |
-|---------|---------------|------|-------------|
-| `backend` | `minden_backend` | 8080 | Go API Server with Oracle Client |
-| `frontend` | `minden_frontend` | 3000 | React Web App |
-
-
-### Environment Variables for Docker
-
-The Docker setup uses the following environment variables:
-
-**Backend:**
-- `CONNECTIONSTRING=your_username/your_password@ORCL`
-- `JWT_SECRET=your_jwt_secret_here_change_in_production`
 
 ### Docker Troubleshooting
 
