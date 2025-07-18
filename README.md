@@ -161,7 +161,7 @@ The backend server will start on `http://localhost:8080`
 3. **Access the application:**
    - The Electron app will launch automatically
    - Backend API: `http://localhost:8080`
-   - Frontend dev server: `http://localhost:5173` (if running web version)
+   - Frontend dev server: `http://localhost:3000`
 
 ### Available Scripts (Frontend)
 
